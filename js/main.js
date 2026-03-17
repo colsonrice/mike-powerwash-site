@@ -97,6 +97,10 @@
   // Close on backdrop tap
   if (navBackdrop) navBackdrop.addEventListener('click', closeMobileNav);
 
+  // Close on X button
+  const mobileNavClose = document.getElementById('mobile-nav-close');
+  if (mobileNavClose) mobileNavClose.addEventListener('click', closeMobileNav);
+
   // Close mobile nav on link click
   mainNav.querySelectorAll('.nav-link').forEach((link) => {
     link.addEventListener('click', closeMobileNav);
