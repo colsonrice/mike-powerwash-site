@@ -24,6 +24,11 @@
   },
   "stats": [
     {
+      "number": 100,
+      "suffix": "s+",
+      "label": "Properties Cleaned"
+    },
+    {
       "number": 5,
       "suffix": "-Star",
       "label": "Average Rating"
@@ -34,14 +39,9 @@
       "label": "Satisfaction Guaranteed"
     },
     {
-      "number": 24,
-      "suffix": "-Hr",
-      "label": "Quote Turnaround"
-    },
-    {
-      "number": 2025,
-      "suffix": "",
-      "label": "Est."
+      "number": 3,
+      "suffix": "+",
+      "label": "Years In Business"
     }
   ],
   "services": [
