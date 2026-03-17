@@ -1,6 +1,6 @@
 {
   "business": {
-    "name": "Suds Away Pro Wash",
+    "name": "SudsAway ProWash",
     "tagline": "Where Cleanliness Shines",
     "phone": "(708) 334-2685",
     "email": "sudsawayprowash@yahoo.com",
@@ -19,15 +19,10 @@
       "Licensed & Insured",
       "100% Satisfaction Guaranteed",
       "Free Estimates",
-      "Eco-Friendly Solutions"
+      "Professional-Grade Equipment"
     ]
   },
   "stats": [
-    {
-      "number": 500,
-      "suffix": "+",
-      "label": "Properties Cleaned"
-    },
     {
       "number": 5,
       "suffix": "-Star",
@@ -36,12 +31,17 @@
     {
       "number": 100,
       "suffix": "%",
-      "label": "Satisfaction Rate"
+      "label": "Satisfaction Guaranteed"
     },
     {
-      "number": 6,
-      "suffix": "+",
-      "label": "Years Experience"
+      "number": 24,
+      "suffix": "-Hr",
+      "label": "Quote Turnaround"
+    },
+    {
+      "number": 2025,
+      "suffix": "",
+      "label": "Est."
     }
   ],
   "services": [
@@ -83,7 +83,7 @@
     {
       "id": "soft-washing",
       "title": "Soft Washing",
-      "description": "For delicate surfaces that can't handle high pressure. Our soft wash system uses eco-friendly, biodegradable solutions at low pressure to safely clean roofs, siding, and painted surfaces.",
+      "description": "For delicate surfaces that can't handle high pressure. Our soft wash system uses specialized cleaning solutions at low pressure to safely clean roofs, siding, and painted surfaces.",
       "icon": "droplet",
       "image": "images/work-1.png"
     }
@@ -119,7 +119,7 @@
     {
       "name": "Sarah M.",
       "rating": 5,
-      "text": "Suds Away completely transformed the look of our home! The siding went from dingy and green to bright white. Couldn't be happier with the results.",
+      "text": "SudsAway completely transformed the look of our home! The siding went from dingy and green to bright white. Couldn't be happier with the results.",
       "service": "House Washing"
     },
     {
@@ -144,7 +144,7 @@
   "faq": [
     {
       "question": "What's the difference between pressure washing and soft washing?",
-      "answer": "Pressure washing uses high-pressure water (1,300-3,100 PSI) for tough surfaces like concrete and driveways. Soft washing uses low pressure (under 500 PSI) with eco-friendly cleaning solutions, making it safe for delicate surfaces like roofs, siding, and painted wood."
+      "answer": "Pressure washing uses high-pressure water (1,300-3,100 PSI) for tough surfaces like concrete and driveways. Soft washing uses low pressure (under 500 PSI) with specialized cleaning solutions, making it safe for delicate surfaces like roofs, siding, and painted wood."
     },
     {
       "question": "Is soft washing safe for my roof?",
@@ -155,8 +155,8 @@
       "answer": "We recommend exterior house washing every 1-2 years depending on your environment. Homes in shaded or humid areas may benefit from annual cleaning to prevent algae and mildew buildup."
     },
     {
-      "question": "Are your cleaning solutions safe for plants and pets?",
-      "answer": "Yes! We use 100% biodegradable, eco-friendly cleaning solutions that are safe for your landscaping, pets, and family. We also take extra precautions to pre-rinse and protect plant beds during service."
+      "question": "What precautions do you take to protect plants and pets?",
+      "answer": "Our cleaning process uses professional-strength solutions that can be harsh on plants and pets. We take precautions by pre-rinsing landscaping, covering delicate plants, and asking that pets be kept inside during service. We always rinse treated areas thoroughly when finished."
     },
     {
       "question": "Do you offer free estimates?",
@@ -164,11 +164,11 @@
     },
     {
       "question": "Are you licensed and insured?",
-      "answer": "Yes, Suds Away Pro Wash is fully licensed and insured, including general liability insurance. Your property is always protected when you work with us."
+      "answer": "Yes, SudsAway ProWash is fully licensed and insured, including general liability insurance. Your property is always protected when you work with us."
     }
   ],
   "about": {
-    "headline": "Why Choose Suds Away Pro Wash?",
+    "headline": "Why Choose SudsAway ProWash?",
     "description": "We're not just another pressure washing company. We combine professional-grade equipment with industry-leading soft wash techniques to deliver results that protect your property while making it look brand new. Every job is backed by our 100% satisfaction guarantee.",
     "values": [
       {
@@ -176,8 +176,8 @@
         "description": "Commercial-quality machines and custom-blended solutions for superior results on every job."
       },
       {
-        "title": "Eco-Friendly Approach",
-        "description": "100% biodegradable cleaning solutions that are safe for your family, pets, and landscaping."
+        "title": "Fast & Reliable",
+        "description": "On-time service with quick turnarounds. We respect your schedule and get the job done right the first time."
       },
       {
         "title": "Satisfaction Guaranteed",

@@ -1,5 +1,5 @@
 /* ========================================================
-   SUDS AWAY PRO WASH — Main JavaScript
+   SUDSAWAY PROWASH — Main JavaScript
    ======================================================== */
 
 (function () {
@@ -284,7 +284,7 @@
         const floatingCta = document.querySelector('.floating-cta');
         if (floatingCta) {
           floatingCta.href = telHref;
-          floatingCta.setAttribute('aria-label', 'Call Suds Away Pro Wash');
+          floatingCta.setAttribute('aria-label', 'Call SudsAway ProWash');
         }
       }
 
