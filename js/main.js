@@ -436,35 +436,58 @@
     });
   });
 
-  // ---- Contact form handling ----
+  // ---- Contact form handling (FormSubmit.co AJAX) ----
   const contactForm = document.getElementById('contact-form');
   if (contactForm) {
-    contactForm.addEventListener('submit', (e) => {
+    contactForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
       // Basic validation
-      const name = contactForm.querySelector('#form-name');
-      const phone = contactForm.querySelector('#form-phone');
+      const nameInput = contactForm.querySelector('#form-name');
+      const phoneInput = contactForm.querySelector('#form-phone');
 
-      if (!name.value.trim() || !phone.value.trim()) {
-        if (!name.value.trim()) name.focus();
-        else phone.focus();
+      if (!nameInput.value.trim() || !phoneInput.value.trim()) {
+        if (!nameInput.value.trim()) nameInput.focus();
+        else phoneInput.focus();
         return;
       }
 
-      // Show success state (use dynamic phone if available)
-      const dynPhone = document.querySelector('.header-cta span');
-      const displayPhone = dynPhone ? dynPhone.textContent : '(555) 123-4567';
-      const dynHref = document.querySelector('.header-cta');
-      const phoneHref = dynHref ? dynHref.href : 'tel:+15551234567';
-      contactForm.innerHTML = `
-        <div class="success-icon" aria-hidden="true">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
-        </div>
-        <h3 class="success-heading">Thank You!</h3>
-        <p class="success-text">We've received your request and will get back to you within a few hours. In the meantime, feel free to call us at <a href="${phoneHref}" style="color:var(--orange);font-weight:600">${escapeText(displayPhone)}</a>.</p>
-      `;
-      contactForm.classList.add('success');
+      // Disable button while sending
+      const submitBtn = contactForm.querySelector('button[type="submit"]');
+      const originalBtnHTML = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner-sm"></span> Sending...';
+
+      try {
+        // Submit via AJAX so user stays on page
+        const formData = new FormData(contactForm);
+        const resp = await fetch(contactForm.action, {
+          method: 'POST',
+          body: formData,
+          headers: { 'Accept': 'application/json' },
+        });
+
+        if (!resp.ok) throw new Error('Send failed');
+
+        // Show success state
+        const dynPhone = document.querySelector('.header-cta span');
+        const displayPhone = dynPhone ? dynPhone.textContent : '(708) 334-2685';
+        const dynHref = document.querySelector('.header-cta');
+        const phoneHref = dynHref ? dynHref.href : 'tel:+17083342685';
+        contactForm.innerHTML = `
+          <div class="success-icon" aria-hidden="true">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
+          </div>
+          <h3 class="success-heading">Thank You!</h3>
+          <p class="success-text">We've received your request and will get back to you within a few hours. In the meantime, feel free to call us at <a href="${phoneHref}" style="color:var(--orange);font-weight:600">${escapeText(displayPhone)}</a>.</p>
+        `;
+        contactForm.classList.add('success');
+      } catch (err) {
+        // Re-enable button on error
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnHTML;
+        alert('Something went wrong. Please try again or call us directly.');
+      }
     });
   }
 
