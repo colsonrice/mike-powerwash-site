@@ -498,8 +498,10 @@
 
       try {
         // Submit via AJAX so user stays on page
+        // FormSubmit.co requires /ajax/ prefix for fetch-based submissions
+        const ajaxUrl = contactForm.action.replace('formsubmit.co/', 'formsubmit.co/ajax/');
         const formData = new FormData(contactForm);
-        const resp = await fetch(contactForm.action, {
+        const resp = await fetch(ajaxUrl, {
           method: 'POST',
           body: formData,
           headers: { 'Accept': 'application/json' },
