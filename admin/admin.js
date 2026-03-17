@@ -278,7 +278,8 @@
 
       var data = await resp.json();
       contentSha = data.sha;
-      var decoded = atob(data.content.replace(/\n/g, ''));
+      var binary = atob(data.content.replace(/\n/g, ''));
+      var decoded = decodeURIComponent(escape(binary));
       contentData = JSON.parse(decoded);
       originalData = deepClone(contentData);
       hasUnsavedChanges = false;
