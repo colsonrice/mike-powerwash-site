@@ -368,6 +368,201 @@
   }
 
   // ================================================
+  // IMAGE UPLOAD (GitHub API)
+  // ================================================
+  const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+  const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5 MB
+
+  /** Read a File as a Base64 string (without data: prefix) */
+  function fileToBase64(file) {
+    return new Promise(function (resolve, reject) {
+      var reader = new FileReader();
+      reader.onload = function () {
+        resolve(reader.result.split(',')[1]);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  /** Generate a unique image path for uploads */
+  function generateImagePath(file, section, index) {
+    var ext = file.name.split('.').pop().toLowerCase();
+    if (['jpg', 'jpeg', 'png', 'webp', 'gif'].indexOf(ext) === -1) ext = 'jpg';
+    return 'images/' + section + '-' + index + '-' + Date.now() + '.' + ext;
+  }
+
+  /** Upload an image file to the GitHub repo */
+  async function uploadImageToGitHub(file, targetPath) {
+    // Validate
+    if (ALLOWED_IMAGE_TYPES.indexOf(file.type) === -1) {
+      showToast('Invalid file type. Use JPG, PNG, WebP, or GIF.', 'error');
+      return null;
+    }
+    if (file.size > MAX_IMAGE_SIZE) {
+      showToast('Image too large. Maximum size is 5 MB.', 'error');
+      return null;
+    }
+
+    var base64 = await fileToBase64(file);
+
+    // Check if file exists (need SHA for overwrite)
+    var sha = null;
+    try {
+      var checkUrl = API_BASE + '/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/' + targetPath + '?ref=' + BRANCH;
+      var checkResp = await fetch(checkUrl, { headers: apiHeaders() });
+      if (checkResp.ok) {
+        var existing = await checkResp.json();
+        sha = existing.sha;
+      }
+    } catch (e) { /* file doesn't exist, that's fine */ }
+
+    // Upload via PUT
+    var url = API_BASE + '/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/' + targetPath;
+    var body = {
+      message: 'Upload image: ' + targetPath,
+      content: base64,
+      branch: BRANCH,
+    };
+    if (sha) body.sha = sha;
+
+    var resp = await fetch(url, {
+      method: 'PUT',
+      headers: apiHeaders(),
+      body: JSON.stringify(body),
+    });
+
+    if (resp.status === 401) {
+      clearToken();
+      showSetup();
+      showToast('Token expired. Please reconnect.', 'error');
+      return null;
+    }
+    if (!resp.ok) {
+      var errData = await resp.json().catch(function () { return {}; });
+      throw new Error(errData.message || 'Upload failed (HTTP ' + resp.status + ')');
+    }
+
+    return targetPath;
+  }
+
+  // ================================================
+  // DROP ZONE COMPONENT
+  // ================================================
+
+  /** Generate drop zone HTML for an image field */
+  function dropZoneHtml(currentImagePath, section, index, fieldKey) {
+    var hasImage = currentImagePath && currentImagePath !== '';
+    var previewSrc = hasImage ? ('../' + currentImagePath) : '';
+    var dataAttrs = 'data-section="' + section + '" data-index="' + index + '" data-field="' + fieldKey + '"';
+
+    return (
+      '<div class="form-group full-width">' +
+      '<label>Image</label>' +
+      '<div class="drop-zone" ' + dataAttrs + '>' +
+        (hasImage
+          ? '<div class="drop-zone-preview">' +
+            '<img src="' + escapeAttr(previewSrc) + '" alt="Current image">' +
+            '<div class="drop-zone-overlay">' +
+              '<span class="drop-zone-replace-text">Drop new image or click to replace</span>' +
+            '</div>' +
+            '</div>'
+          : '<div class="drop-zone-empty">' +
+            '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>' +
+            '<span class="drop-zone-text">Drag &amp; drop an image here</span>' +
+            '<span class="drop-zone-or">or</span>' +
+            '<span class="drop-zone-browse btn btn-outline btn-sm">Browse Files</span>' +
+            '</div>'
+        ) +
+        '<div class="drop-zone-uploading dz-hidden">' +
+          '<div class="spinner" style="width:24px;height:24px;border-width:2px;"></div>' +
+          '<span>Uploading...</span>' +
+        '</div>' +
+        '<input type="file" class="drop-zone-input sr-only" accept="image/jpeg,image/png,image/webp,image/gif">' +
+      '</div>' +
+      '<div class="drop-zone-path">' +
+        '<small>' + escapeHtml(currentImagePath || 'No image') + '</small>' +
+      '</div>' +
+      '</div>'
+    );
+  }
+
+  /** Bind drag-and-drop + click events on all .drop-zone elements inside a container */
+  function bindDropZones(container) {
+    container.querySelectorAll('.drop-zone').forEach(function (zone) {
+      var fileInput = zone.querySelector('.drop-zone-input');
+
+      // Click to browse
+      zone.addEventListener('click', function (e) {
+        if (e.target.closest('.drop-zone-input')) return;
+        fileInput.click();
+      });
+
+      // File input change
+      fileInput.addEventListener('change', function () {
+        if (fileInput.files.length) {
+          handleDropZoneFile(zone, fileInput.files[0]);
+        }
+      });
+
+      // Drag events
+      zone.addEventListener('dragover', function (e) {
+        e.preventDefault();
+        zone.classList.add('drag-over');
+      });
+      zone.addEventListener('dragleave', function (e) {
+        e.preventDefault();
+        zone.classList.remove('drag-over');
+      });
+      zone.addEventListener('drop', function (e) {
+        e.preventDefault();
+        zone.classList.remove('drag-over');
+        if (e.dataTransfer.files.length) {
+          handleDropZoneFile(zone, e.dataTransfer.files[0]);
+        }
+      });
+    });
+  }
+
+  /** Handle a dropped/selected file for a drop zone */
+  async function handleDropZoneFile(zone, file) {
+    var section = zone.dataset.section;
+    var index = parseInt(zone.dataset.index);
+    var fieldKey = zone.dataset.field;
+
+    // Show uploading state
+    var uploading = zone.querySelector('.drop-zone-uploading');
+    var preview = zone.querySelector('.drop-zone-preview') || zone.querySelector('.drop-zone-empty');
+    if (preview) preview.classList.add('dz-hidden');
+    uploading.classList.remove('dz-hidden');
+
+    try {
+      var targetPath = generateImagePath(file, section, index);
+      var result = await uploadImageToGitHub(file, targetPath);
+
+      if (result) {
+        // Update contentData
+        var arr = contentData[section];
+        if (arr && arr[index]) {
+          arr[index][fieldKey] = result;
+        }
+        markDirty();
+        showToast('Image uploaded! Remember to save.', 'success');
+        // Re-render section to show new preview
+        renderCurrentSection();
+      } else {
+        // Validation failed — restore previous state
+        uploading.classList.add('dz-hidden');
+        if (preview) preview.classList.remove('dz-hidden');
+      }
+    } catch (err) {
+      showToast('Upload failed: ' + err.message, 'error', 6000);
+      uploading.classList.add('dz-hidden');
+      if (preview) preview.classList.remove('dz-hidden');
+    }
+  }
+
+  // ================================================
   // NAVIGATION
   // ================================================
   function initNavigation() {
@@ -848,7 +1043,7 @@
           field('ID (slug)', svc.id, 'data-key="id" data-index="' + i + '"') +
           field('Title', svc.title, 'data-key="title" data-index="' + i + '"') +
           field('Icon', svc.icon, 'data-key="icon" data-index="' + i + '"') +
-          field('Image Path', svc.image, 'data-key="image" data-index="' + i + '"') +
+          dropZoneHtml(svc.image, 'services', i, 'image') +
           textareaField(
             'Description',
             svc.description,
@@ -860,6 +1055,7 @@
 
     bindItemCardToggles(list);
     bindItemInputs(list, 'services');
+    bindDropZones(list);
   }
 
   function initServices() {
@@ -896,8 +1092,7 @@
     list.innerHTML = gallery
       .map(function (item, i) {
         var fields =
-          field('Before Image Path', item.before, 'data-key="before" data-index="' + i + '"') +
-          field('After Image Path', item.after, 'data-key="after" data-index="' + i + '"') +
+          dropZoneHtml(item.image, 'gallery', i, 'image') +
           field('Caption', item.caption, 'data-key="caption" data-index="' + i + '"') +
           field('Category', item.category, 'data-key="category" data-index="' + i + '"');
         return createItemCard(i, item.caption, fields, { section: 'gallery' });
@@ -906,14 +1101,14 @@
 
     bindItemCardToggles(list);
     bindItemInputs(list, 'gallery');
+    bindDropZones(list);
   }
 
   function initGallery() {
     $('#add-gallery-btn').addEventListener('click', function () {
       if (!contentData.gallery) contentData.gallery = [];
       contentData.gallery.push({
-        before: 'images/before.png',
-        after: 'images/after.png',
+        image: '',
         caption: 'New Project',
         category: 'general',
       });
@@ -1221,6 +1416,10 @@
     initAbout();
     initDeleteHandler();
     initSettings();
+
+    // Prevent browser from opening dropped files outside drop zones
+    document.addEventListener('dragover', function (e) { e.preventDefault(); });
+    document.addEventListener('drop', function (e) { e.preventDefault(); });
 
     // Check if already connected
     if (isConnected()) {

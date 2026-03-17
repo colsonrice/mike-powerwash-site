@@ -340,6 +340,11 @@
       if (data.services && data.services.length) {
         renderServicesFromData(data.services);
       }
+
+      // --- Gallery ---
+      if (data.gallery && data.gallery.length) {
+        renderGalleryFromData(data.gallery);
+      }
     })
     .catch(err => console.warn('Could not load content.json:', err));
 
@@ -404,6 +409,35 @@
     }).join('');
 
     // Re-observe new cards for scroll reveal
+    if ('IntersectionObserver' in window) {
+      grid.querySelectorAll('.reveal').forEach(el => {
+        const obs = new IntersectionObserver((entries) => {
+          entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }});
+        }, { threshold: 0.15 });
+        obs.observe(el);
+      });
+    }
+  }
+
+  // ---- Render Gallery dynamically ----
+  function renderGalleryFromData(gallery) {
+    const grid = document.getElementById('gallery-grid');
+    if (!grid) return;
+
+    grid.innerHTML = gallery.map(item => {
+      if (!item.image) return ''; // skip items with no image
+      return `
+        <figure class="gallery-card reveal" aria-label="${escapeText(item.caption)}">
+          <div class="gallery-img-wrap">
+            <img src="${escapeText(item.image)}" alt="${escapeText(item.caption)}" loading="lazy" width="800" height="800">
+          </div>
+          <figcaption class="gallery-caption">
+            <strong>${escapeText(item.caption)}</strong>
+          </figcaption>
+        </figure>`;
+    }).join('');
+
+    // Re-observe for scroll reveal
     if ('IntersectionObserver' in window) {
       grid.querySelectorAll('.reveal').forEach(el => {
         const obs = new IntersectionObserver((entries) => {

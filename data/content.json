@@ -89,14 +89,12 @@
   ],
   "gallery": [
     {
-      "before": "images/work-1.png",
-      "after": "images/work-1.png",
+      "image": "images/work-1.png",
       "caption": "House Siding — Soft Wash",
       "category": "house-washing"
     },
     {
-      "before": "images/work-2.jpg",
-      "after": "images/work-2.jpg",
+      "image": "images/work-2.jpg",
       "caption": "Roof Cleaning — Soft Wash",
       "category": "roof-cleaning"
     }

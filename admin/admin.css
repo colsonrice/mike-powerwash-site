@@ -1050,6 +1050,132 @@ img {
 }
 
 /* ================================================
+   DROP ZONE (Image Upload)
+   ================================================ */
+.drop-zone {
+  position: relative;
+  border: 2px dashed var(--gray-300);
+  border-radius: var(--radius);
+  min-height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition);
+  overflow: hidden;
+  background: var(--gray-50);
+}
+.drop-zone:hover {
+  border-color: var(--blue);
+  background: #f0f7ff;
+}
+.drop-zone.drag-over {
+  border-color: var(--orange);
+  background: #fff8f4;
+  border-style: solid;
+  box-shadow: inset 0 0 0 2px rgba(255, 107, 53, 0.1);
+}
+
+/* Empty state */
+.drop-zone-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 2rem;
+  color: var(--gray-400);
+  text-align: center;
+}
+.drop-zone-empty svg {
+  color: var(--gray-300);
+  margin-bottom: 0.25rem;
+}
+.drop-zone-text {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--gray-500);
+}
+.drop-zone-or {
+  font-size: 0.75rem;
+  color: var(--gray-400);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.drop-zone-browse {
+  pointer-events: none; /* parent handles click */
+}
+
+/* Preview state */
+.drop-zone-preview {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 160px;
+}
+.drop-zone-preview img {
+  width: 100%;
+  height: 100%;
+  min-height: 160px;
+  max-height: 240px;
+  object-fit: cover;
+  display: block;
+}
+.drop-zone-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 36, 99, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+.drop-zone:hover .drop-zone-overlay,
+.drop-zone.drag-over .drop-zone-overlay {
+  opacity: 1;
+}
+.drop-zone-replace-text {
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: var(--font-heading);
+  padding: 0.5rem 1rem;
+  background: rgba(255, 107, 53, 0.9);
+  border-radius: var(--radius);
+}
+
+/* Uploading state */
+.drop-zone-uploading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 2rem;
+  color: var(--blue);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+.drop-zone-uploading.dz-hidden {
+  display: none;
+}
+
+/* Image path display */
+.drop-zone-path {
+  margin-top: 0.35rem;
+}
+.drop-zone-path small {
+  color: var(--gray-400);
+  font-size: 0.72rem;
+  font-family: monospace;
+  word-break: break-all;
+}
+
+/* Full-width form group for drop zone */
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+/* ================================================
    RESPONSIVE
    ================================================ */
 @media (max-width: 1024px) {
