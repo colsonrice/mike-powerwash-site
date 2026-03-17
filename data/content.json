@@ -22,23 +22,39 @@
     ]
   },
   "stats": [
-    { "number": 500, "suffix": "+", "label": "Properties Cleaned" },
-    { "number": 5, "suffix": "-Star", "label": "Average Rating" },
-    { "number": 100, "suffix": "%", "label": "Satisfaction Rate" },
-    { "number": 6, "suffix": "+", "label": "Years Experience" }
+    {
+      "number": 500,
+      "suffix": "+",
+      "label": "Properties Cleaned"
+    },
+    {
+      "number": 5,
+      "suffix": "-Star",
+      "label": "Average Rating"
+    },
+    {
+      "number": 100,
+      "suffix": "%",
+      "label": "Satisfaction Rate"
+    },
+    {
+      "number": 6,
+      "suffix": "+",
+      "label": "Years Experience"
+    }
   ],
   "services": [
     {
       "id": "house-washing",
       "title": "House Washing",
-      "description": "Restore your home's curb appeal with our safe, effective soft washing system. We gently remove years of dirt, algae, mildew, and grime from siding, brick, stucco, and more — without damaging your surfaces.",
+      "description": "Restore your home's curb appeal with our safe, effective soft washing system. We gently remove years of dirt, algae, mildew, and grime from siding, brick, stucco, and more â without damaging your surfaces.",
       "icon": "home",
       "image": "images/work-1.png"
     },
     {
       "id": "roof-cleaning",
       "title": "Roof Cleaning",
-      "description": "Black streaks and moss don't just look bad — they shorten your roof's lifespan. Our soft wash roof cleaning safely eliminates algae and stains, extending your roof's life by years.",
+      "description": "Black streaks and moss don't just look bad â they shorten your roof's lifespan. Our soft wash roof cleaning safely eliminates algae and stains, extending your roof's life by years.",
       "icon": "roof",
       "image": "images/work-2.jpg"
     },
@@ -75,13 +91,13 @@
     {
       "before": "images/work-1.png",
       "after": "images/work-1.png",
-      "caption": "House Siding — Soft Wash",
+      "caption": "House Siding â Soft Wash",
       "category": "house-washing"
     },
     {
       "before": "images/work-2.jpg",
       "after": "images/work-2.jpg",
-      "caption": "Roof Cleaning — Soft Wash",
+      "caption": "Roof Cleaning â Soft Wash",
       "category": "roof-cleaning"
     }
   ],
@@ -95,7 +111,7 @@
     {
       "name": "James R.",
       "rating": 5,
-      "text": "I was amazed at the difference in my roof — those ugly black streaks are completely gone. Professional, on time, and the price was very fair.",
+      "text": "I was amazed at the difference in my roof â those ugly black streaks are completely gone. Professional, on time, and the price was very fair.",
       "service": "Roof Cleaning"
     },
     {
@@ -103,6 +119,12 @@
       "rating": 5,
       "text": "Our driveway hadn't been cleaned in over 10 years. It looks brand new! Mike was incredibly professional and thorough. Highly recommend!",
       "service": "Driveway Cleaning"
+    },
+    {
+      "name": "John R.",
+      "rating": 5,
+      "text": "Mike made my house look like it was brand new!",
+      "service": "House Washing"
     }
   ],
   "faq": [
@@ -124,7 +146,7 @@
     },
     {
       "question": "Do you offer free estimates?",
-      "answer": "Yes, we provide completely free, no-obligation estimates. Call us or fill out our contact form and we'll get back to you quickly — usually within a few hours."
+      "answer": "Yes, we provide completely free, no-obligation estimates. Call us or fill out our contact form and we'll get back to you quickly â usually within a few hours."
     },
     {
       "question": "Are you licensed and insured?",
