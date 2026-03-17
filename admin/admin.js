@@ -1,99 +1,93 @@
 /* ==============================================
-   ADMIN CRM - Suds Away Pro Wash
+   ADMIN CRM - Content Manager
    JavaScript Application Logic
+   GitHub API Mode (one-time setup)
    ============================================== */
 
 (function () {
   'use strict';
 
   // ================================================
-  // CONFIGURATION
+  // CONFIG
   // ================================================
-  const API_BASE = 'https://api.github.com';
-  const CONTENT_PATH = 'data/content.json';
-  const IMAGES_DIR = 'images';
+  const REPO_OWNER = 'colsonrice';
+  const REPO_NAME = 'mike-powerwash-site';
   const BRANCH = 'main';
+  const CONTENT_PATH = 'data/content.json';
+  const API_BASE = 'https://api.github.com';
 
   // ================================================
   // STATE
   // ================================================
-  let contentData = null;      // parsed content.json
-  let contentSha = null;       // SHA of content.json (needed for updates)
-  let originalData = null;     // deep clone for cancel/revert
+  let contentData = null;
+  let originalData = null;
+  let contentSha = null;      // SHA of content.json for GitHub API updates
   let currentSection = 'dashboard';
+  let hasUnsavedChanges = false;
 
   // ================================================
-  // DOM REFERENCES
+  // DOM HELPERS
   // ================================================
   const $ = (sel, ctx = document) => ctx.querySelector(sel);
   const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
 
-  const loginScreen = $('#login-screen');
-  const appShell = $('#app-shell');
   const sidebar = $('#sidebar');
   const sidebarOverlay = $('#sidebar-overlay');
-  const mainContent = $('#main-content');
   const loadingOverlay = $('#loading-overlay');
   const loadingText = $('#loading-text');
   const toastContainer = $('#toast-container');
+  const unsavedBar = $('#unsaved-bar');
 
   // ================================================
-  // HELPERS
+  // GITHUB TOKEN MANAGEMENT
   // ================================================
-
-  /** Get the stored GitHub token */
   function getToken() {
-    return sessionStorage.getItem('gh_token') || '';
+    return localStorage.getItem('sudsaway_gh_token');
   }
 
-  /** Get repo owner */
-  function getOwner() {
-    return localStorage.getItem('crm_repo_owner') || 'colsonrice';
+  function setToken(token) {
+    localStorage.setItem('sudsaway_gh_token', token);
   }
 
-  /** Get repo name */
-  function getRepoName() {
-    return localStorage.getItem('crm_repo_name') || 'mike-powerwash-site';
+  function clearToken() {
+    localStorage.removeItem('sudsaway_gh_token');
   }
 
-  /** Build API URL */
-  function apiUrl(path) {
-    return `${API_BASE}/repos/${getOwner()}/${getRepoName()}/contents/${path}`;
+  function isConnected() {
+    return !!getToken();
   }
 
-  /** Common fetch headers */
-  function headers() {
+  function apiHeaders() {
     return {
-      Authorization: `Bearer ${getToken()}`,
+      Authorization: 'Bearer ' + getToken(),
       Accept: 'application/vnd.github.v3+json',
       'Content-Type': 'application/json',
     };
   }
+
+  // ================================================
+  // UTILITY FUNCTIONS
+  // ================================================
 
   /** Deep clone an object */
   function deepClone(obj) {
     return JSON.parse(JSON.stringify(obj));
   }
 
-  /** Encode string to base64 (supports unicode) */
-  function toBase64(str) {
-    return btoa(unescape(encodeURIComponent(str)));
+  /** Escape HTML to prevent XSS */
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
   }
 
-  /** Decode base64 to string */
-  function fromBase64(b64) {
-    return decodeURIComponent(escape(atob(b64)));
-  }
-
-  /** Show loading overlay */
-  function showLoading(text = 'Loading content...') {
-    loadingText.textContent = text;
-    loadingOverlay.style.display = 'flex';
-  }
-
-  /** Hide loading overlay */
-  function hideLoading() {
-    loadingOverlay.style.display = 'none';
+  /** Escape for use in HTML attributes */
+  function escapeAttr(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
   }
 
   /** Format a date for display */
@@ -107,227 +101,270 @@
     }).format(date);
   }
 
+  /** Show loading overlay */
+  function showLoading(text) {
+    loadingText.textContent = text || 'Loading content...';
+    loadingOverlay.classList.remove('hidden');
+    loadingOverlay.style.display = '';
+  }
+
+  /** Hide loading overlay */
+  function hideLoading() {
+    loadingOverlay.classList.add('hidden');
+  }
+
+  /** Mark content as changed */
+  function markDirty() {
+    hasUnsavedChanges = true;
+    updateUnsavedUI();
+  }
+
+  /** Check if data actually differs from original */
+  function checkIfDirty() {
+    if (!contentData || !originalData) {
+      hasUnsavedChanges = false;
+    } else {
+      hasUnsavedChanges =
+        JSON.stringify(contentData) !== JSON.stringify(originalData);
+    }
+    updateUnsavedUI();
+  }
+
+  /** Update all unsaved change indicators */
+  function updateUnsavedUI() {
+    // Unsaved bar on dashboard
+    if (unsavedBar) {
+      unsavedBar.style.display = hasUnsavedChanges ? '' : 'none';
+    }
+    // Mobile indicator
+    const mobileIndicator = $('#mobile-save-indicator');
+    if (mobileIndicator) {
+      mobileIndicator.style.display = hasUnsavedChanges ? '' : 'none';
+    }
+  }
+
   // ================================================
   // TOAST NOTIFICATIONS
   // ================================================
-  function showToast(message, type = 'info', duration = 4000) {
+  function showToast(message, type, duration) {
+    type = type || 'info';
+    duration = duration || 4000;
+
     const icons = {
-      success: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
-      error: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
-      info: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
+      success:
+        '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+      error:
+        '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+      info:
+        '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
     };
 
     const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
-    toast.innerHTML = `
-      <span class="toast-icon">${icons[type] || icons.info}</span>
-      <span class="toast-message">${escapeHtml(message)}</span>
-      <button class="toast-close" aria-label="Close">&times;</button>
-    `;
+    toast.className = 'toast toast-' + type;
+    toast.innerHTML =
+      '<span class="toast-icon">' +
+      (icons[type] || icons.info) +
+      '</span>' +
+      '<span class="toast-message">' +
+      escapeHtml(message) +
+      '</span>' +
+      '<button class="toast-close" aria-label="Close">&times;</button>';
 
     toastContainer.appendChild(toast);
 
-    const closeBtn = toast.querySelector('.toast-close');
-    const remove = () => {
+    var closeBtn = toast.querySelector('.toast-close');
+    var remove = function () {
       toast.classList.add('removing');
-      setTimeout(() => toast.remove(), 250);
+      setTimeout(function () {
+        toast.remove();
+      }, 250);
     };
     closeBtn.addEventListener('click', remove);
     setTimeout(remove, duration);
   }
 
-  /** Escape HTML to prevent XSS in toast messages */
-  function escapeHtml(str) {
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
+  // ================================================
+  // SETUP FLOW
+  // ================================================
+  function showSetup() {
+    var setup = $('#setup-screen');
+    var app = $('#app-shell');
+    if (setup) setup.style.display = '';
+    if (app) app.style.display = 'none';
   }
 
-  // ================================================
-  // GITHUB API METHODS
-  // ================================================
+  function showApp() {
+    var setup = $('#setup-screen');
+    var app = $('#app-shell');
+    if (setup) setup.style.display = 'none';
+    if (app) app.style.display = '';
+    updateConnectionStatus();
+  }
 
-  /** Fetch a file from the repo */
-  async function fetchFile(path) {
-    const url = apiUrl(path) + `?ref=${BRANCH}`;
-    const res = await fetch(url, { headers: headers() });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.message || `Failed to fetch ${path} (${res.status})`);
+  function updateConnectionStatus() {
+    var dot = $('#settings-status-dot');
+    var text = $('#settings-status-text');
+    if (dot) dot.style.background = isConnected() ? 'var(--success)' : 'var(--gray-400)';
+    if (text) text.textContent = isConnected() ? 'Connected' : 'Not connected';
+  }
+
+  async function validateAndConnect(token) {
+    try {
+      var resp = await fetch(API_BASE + '/user', {
+        headers: { Authorization: 'Bearer ' + token, Accept: 'application/vnd.github.v3+json' },
+      });
+      if (!resp.ok) throw new Error('Invalid token');
+      var user = await resp.json();
+      setToken(token);
+      showApp();
+      loadContent();
+      showToast('Connected as ' + user.login, 'success');
+      return true;
+    } catch (err) {
+      showToast('Connection failed: ' + err.message, 'error');
+      return false;
     }
-    return res.json();
   }
 
-  /** Update or create a file in the repo.
-   *  If isBase64 is true, content is already base64-encoded (e.g. images). */
-  async function putFile(path, content, message, sha = null, isBase64 = false) {
-    const body = {
-      message,
-      content: isBase64 ? content : toBase64(content),
-      branch: BRANCH,
-    };
-    if (sha) body.sha = sha;
+  function initSetup() {
+    var form = $('#setup-form');
+    if (!form) return;
 
-    const res = await fetch(apiUrl(path), {
-      method: 'PUT',
-      headers: headers(),
-      body: JSON.stringify(body),
-    });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.message || `Failed to save ${path} (${res.status})`);
-    }
-    return res.json();
-  }
-
-  /** List contents of a directory */
-  async function listDir(path) {
-    const url = apiUrl(path) + `?ref=${BRANCH}`;
-    const res = await fetch(url, { headers: headers() });
-    if (!res.ok) {
-      if (res.status === 404) return [];
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.message || `Failed to list ${path} (${res.status})`);
-    }
-    const data = await res.json();
-    return Array.isArray(data) ? data : [];
-  }
-
-  /** Validate the token works by calling /user */
-  async function validateToken() {
-    const res = await fetch(`${API_BASE}/user`, { headers: headers() });
-    if (!res.ok) throw new Error('Invalid token or API error');
-    return res.json();
-  }
-
-  // ================================================
-  // AUTHENTICATION
-  // ================================================
-  function initAuth() {
-    const form = $('#login-form');
-    const tokenInput = $('#gh-token');
-    const ownerInput = $('#repo-owner');
-    const nameInput = $('#repo-name');
-    const loginBtn = $('#login-btn');
-    const toggleBtn = $('#toggle-token-vis');
-
-    // Restore repo settings
-    ownerInput.value = getOwner();
-    nameInput.value = getRepoName();
-
-    // Toggle password visibility
-    toggleBtn.addEventListener('click', () => {
-      const isPassword = tokenInput.type === 'password';
-      tokenInput.type = isPassword ? 'text' : 'password';
-      toggleBtn.querySelector('.eye-icon').style.display = isPassword ? 'none' : '';
-      toggleBtn.querySelector('.eye-off-icon').style.display = isPassword ? '' : 'none';
-    });
-
-    form.addEventListener('submit', async (e) => {
+    form.addEventListener('submit', async function (e) {
       e.preventDefault();
-      const token = tokenInput.value.trim();
-      const owner = ownerInput.value.trim();
-      const repo = nameInput.value.trim();
+      var tokenInput = $('#setup-token');
+      var btn = $('#setup-connect-btn');
+      var token = tokenInput.value.trim();
+      if (!token) return;
 
-      if (!token) return showToast('Please enter your GitHub token', 'error');
-      if (!owner || !repo) return showToast('Please enter repo owner and name', 'error');
-
-      // Save settings
-      sessionStorage.setItem('gh_token', token);
-      localStorage.setItem('crm_repo_owner', owner);
-      localStorage.setItem('crm_repo_name', repo);
-
-      // Show loading
-      loginBtn.querySelector('.btn-text').style.display = 'none';
-      loginBtn.querySelector('.btn-loader').style.display = '';
-      loginBtn.disabled = true;
-
-      try {
-        await validateToken();
-        showToast('Authenticated successfully', 'success');
-        await enterApp();
-      } catch (err) {
-        showToast('Authentication failed: ' + err.message, 'error');
-        sessionStorage.removeItem('gh_token');
-      } finally {
-        loginBtn.querySelector('.btn-text').style.display = '';
-        loginBtn.querySelector('.btn-loader').style.display = 'none';
-        loginBtn.disabled = false;
-      }
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner" style="width:18px;height:18px;border-width:2px;display:inline-block;margin-right:8px;vertical-align:middle"></span> Connecting...';
+      var ok = await validateAndConnect(token);
+      btn.disabled = false;
+      btn.textContent = 'Connect';
+      if (!ok) tokenInput.focus();
     });
 
-    // Auto-login if token exists
-    if (getToken()) {
-      enterApp();
+    // Toggle token visibility
+    var toggleBtn = $('#toggle-token-vis');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function () {
+        var input = $('#setup-token');
+        var isPassword = input.type === 'password';
+        input.type = isPassword ? 'text' : 'password';
+        toggleBtn.textContent = isPassword ? 'Hide' : 'Show';
+      });
     }
   }
 
-  function logout() {
-    sessionStorage.removeItem('gh_token');
-    loginScreen.style.display = '';
-    appShell.style.display = 'none';
-    contentData = null;
-    contentSha = null;
-    originalData = null;
-  }
-
-  async function enterApp() {
-    loginScreen.style.display = 'none';
-    appShell.style.display = 'flex';
-    updateRepoInfo();
-    await loadContent();
-  }
-
-  function updateRepoInfo() {
-    const repoText = `${getOwner()}/${getRepoName()}`;
-    $('#sidebar-repo-info').textContent = repoText;
-  }
-
   // ================================================
-  // CONTENT LOADING
+  // CONTENT LOADING (GitHub API)
   // ================================================
   async function loadContent() {
-    showLoading('Fetching content from GitHub...');
+    showLoading('Loading content from GitHub...');
     try {
-      const file = await fetchFile(CONTENT_PATH);
-      const decoded = fromBase64(file.content.replace(/\n/g, ''));
+      var url = API_BASE + '/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/' + CONTENT_PATH + '?ref=' + BRANCH;
+      var resp = await fetch(url, { headers: apiHeaders() });
+
+      if (resp.status === 401) {
+        hideLoading();
+        clearToken();
+        showSetup();
+        showToast('Token expired or invalid. Please reconnect.', 'error');
+        return;
+      }
+
+      if (!resp.ok) throw new Error('Failed to load content (HTTP ' + resp.status + ')');
+
+      var data = await resp.json();
+      contentSha = data.sha;
+      var decoded = atob(data.content.replace(/\n/g, ''));
       contentData = JSON.parse(decoded);
-      contentSha = file.sha;
       originalData = deepClone(contentData);
+      hasUnsavedChanges = false;
+      updateUnsavedUI();
       renderCurrentSection();
       renderDashboard();
-      showToast('Content loaded successfully', 'success');
-    } catch (err) {
-      showToast('Failed to load content: ' + err.message, 'error');
-    } finally {
       hideLoading();
+    } catch (err) {
+      hideLoading();
+      showToast('Failed to load content: ' + err.message, 'error', 8000);
+      var main = $('#main-content');
+      if (main) {
+        $$('.page').forEach(function (p) { p.style.display = 'none'; });
+        var errorDiv = document.createElement('div');
+        errorDiv.innerHTML =
+          '<div class="error-state">' +
+          '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>' +
+          '<h3>Could not load content</h3>' +
+          '<p>' + escapeHtml(err.message) + '</p>' +
+          '<button class="btn btn-primary" onclick="location.reload()">Retry</button>' +
+          '</div>';
+        main.appendChild(errorDiv);
+      }
     }
   }
 
   // ================================================
-  // SAVE CONTENT
+  // SAVE TO GITHUB
   // ================================================
-  async function saveContent(sectionLabel) {
-    showLoading(`Saving ${sectionLabel}...`);
+  async function saveToGitHub() {
+    if (!contentData) {
+      showToast('No content to save', 'error');
+      return;
+    }
+
+    showLoading('Saving changes...');
     try {
-      const jsonStr = JSON.stringify(contentData, null, 2) + '\n';
-      const message = `Update ${sectionLabel} via CRM`;
-      const result = await putFile(CONTENT_PATH, jsonStr, message, contentSha);
+      var jsonStr = JSON.stringify(contentData, null, 2) + '\n';
+      var encoded = btoa(unescape(encodeURIComponent(jsonStr)));
+
+      var url = API_BASE + '/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/' + CONTENT_PATH;
+      var resp = await fetch(url, {
+        method: 'PUT',
+        headers: apiHeaders(),
+        body: JSON.stringify({
+          message: 'Update content via CRM',
+          content: encoded,
+          sha: contentSha,
+          branch: BRANCH,
+        }),
+      });
+
+      if (resp.status === 401) {
+        hideLoading();
+        clearToken();
+        showSetup();
+        showToast('Token expired. Please reconnect.', 'error');
+        return;
+      }
+
+      if (!resp.ok) {
+        var errData = await resp.json().catch(function () { return {}; });
+        throw new Error(errData.message || 'HTTP ' + resp.status);
+      }
+
+      var result = await resp.json();
       contentSha = result.content.sha;
       originalData = deepClone(contentData);
-      showToast(`${sectionLabel} saved and committed successfully`, 'success');
-    } catch (err) {
-      showToast('Failed to save: ' + err.message, 'error');
-    } finally {
+      hasUnsavedChanges = false;
+      updateUnsavedUI();
       hideLoading();
+      showToast('Changes saved! Your website will update in about 30 seconds.', 'success', 5000);
+    } catch (err) {
+      hideLoading();
+      showToast('Save failed: ' + err.message, 'error', 6000);
     }
   }
 
-  function cancelChanges() {
+  /** Reset content to the originally loaded data */
+  function resetContent() {
     if (!originalData) return;
     contentData = deepClone(originalData);
+    hasUnsavedChanges = false;
+    updateUnsavedUI();
     renderCurrentSection();
-    showToast('Changes reverted', 'info');
+    showToast('Changes reverted to last saved state', 'info');
   }
 
   // ================================================
@@ -335,71 +372,92 @@
   // ================================================
   function initNavigation() {
     // Sidebar nav links
-    $$('.nav-link').forEach((link) => {
-      link.addEventListener('click', (e) => {
+    $$('.nav-link').forEach(function (link) {
+      link.addEventListener('click', function (e) {
         e.preventDefault();
-        const section = link.dataset.section;
-        navigateTo(section);
+        navigateTo(link.dataset.section);
       });
     });
 
-    // Dashboard stat cards
-    document.addEventListener('click', (e) => {
-      const card = e.target.closest('.stat-card[data-link]');
+    // Dashboard stat cards and quick action buttons
+    document.addEventListener('click', function (e) {
+      var card = e.target.closest('.stat-card[data-link]');
       if (card) navigateTo(card.dataset.link);
 
-      const navBtn = e.target.closest('[data-nav]');
+      var navBtn = e.target.closest('[data-nav]');
       if (navBtn) navigateTo(navBtn.dataset.nav);
     });
 
-    // Cancel buttons
-    document.addEventListener('click', (e) => {
-      if (e.target.closest('.cancel-btn')) {
-        cancelChanges();
+    // Save & Download buttons (global, per-section, unsaved bar)
+    document.addEventListener('click', function (e) {
+      if (
+        e.target.closest('#global-save-btn') ||
+        e.target.closest('.save-btn') ||
+        e.target.closest('#unsaved-save-btn')
+      ) {
+        saveToGitHub();
       }
     });
 
-    // Save section buttons (for array sections)
-    document.addEventListener('click', (e) => {
-      const btn = e.target.closest('.save-section-btn');
-      if (btn) {
-        const section = btn.dataset.section;
-        saveContent(section);
+    // Reset buttons
+    document.addEventListener('click', function (e) {
+      if (
+        e.target.closest('.reset-section-btn') ||
+        e.target.closest('#unsaved-reset-btn')
+      ) {
+        resetContent();
       }
     });
 
-    // Logout
-    $('#logout-btn').addEventListener('click', logout);
-    $('#mobile-logout-btn').addEventListener('click', logout);
+    // Info banner dismiss
+    var bannerClose = $('#info-banner-close');
+    if (bannerClose) {
+      bannerClose.addEventListener('click', function () {
+        var banner = $('#info-banner');
+        if (banner) banner.classList.add('hidden');
+      });
+    }
 
     // Mobile sidebar
-    $('#hamburger').addEventListener('click', () => {
+    $('#hamburger').addEventListener('click', function () {
       sidebar.classList.add('open');
       sidebarOverlay.classList.add('visible');
     });
-    const closeSidebar = () => {
+    var closeSidebar = function () {
       sidebar.classList.remove('open');
       sidebarOverlay.classList.remove('visible');
     };
     $('#sidebar-close').addEventListener('click', closeSidebar);
     sidebarOverlay.addEventListener('click', closeSidebar);
+
+    // Warn before leaving with unsaved changes
+    window.addEventListener('beforeunload', function (e) {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    });
   }
 
   function navigateTo(section) {
     currentSection = section;
 
     // Update nav active state
-    $$('.nav-link').forEach((l) => l.classList.remove('active'));
-    const activeLink = $(`.nav-link[data-section="${section}"]`);
+    $$('.nav-link').forEach(function (l) {
+      l.classList.remove('active');
+    });
+    var activeLink = $('[data-section="' + section + '"].nav-link');
     if (activeLink) activeLink.classList.add('active');
 
     // Show the right page
-    $$('.page').forEach((p) => (p.style.display = 'none'));
-    const page = $(`#page-${section}`);
+    $$('.page').forEach(function (p) {
+      p.style.display = 'none';
+    });
+    var page = $('#page-' + section);
     if (page) page.style.display = '';
 
     // Update mobile header
-    const titleMap = {
+    var titleMap = {
       dashboard: 'Dashboard',
       business: 'Business Info',
       hero: 'Hero Section',
@@ -409,7 +467,6 @@
       testimonials: 'Testimonials',
       faq: 'FAQ',
       about: 'About',
-      images: 'Image Manager',
     };
     $('#mobile-page-title').textContent = titleMap[section] || 'Dashboard';
 
@@ -451,9 +508,6 @@
       case 'about':
         renderAbout();
         break;
-      case 'images':
-        renderImages();
-        break;
     }
   }
 
@@ -462,20 +516,27 @@
   // ================================================
   function renderDashboard() {
     if (!contentData) return;
-    const d = contentData;
+    var d = contentData;
 
     $('#dash-services-count').textContent = d.services ? d.services.length : 0;
-    $('#dash-testimonials-count').textContent = d.testimonials ? d.testimonials.length : 0;
+    $('#dash-testimonials-count').textContent = d.testimonials
+      ? d.testimonials.length
+      : 0;
     $('#dash-gallery-count').textContent = d.gallery ? d.gallery.length : 0;
     $('#dash-faq-count').textContent = d.faq ? d.faq.length : 0;
 
-    $('#dash-biz-name').textContent = d.business?.name || '--';
-    $('#dash-biz-phone').textContent = d.business?.phone || '--';
-    $('#dash-biz-email').textContent = d.business?.email || '--';
-    $('#dash-biz-year').textContent = d.business?.yearEstablished || '--';
+    $('#dash-biz-name').textContent = (d.business && d.business.name) || '--';
+    $('#dash-biz-phone').textContent = (d.business && d.business.phone) || '--';
+    $('#dash-biz-email').textContent = (d.business && d.business.email) || '--';
+    $('#dash-biz-year').textContent =
+      (d.business && d.business.yearEstablished) || '--';
 
-    $('#sidebar-business-name').textContent = d.business?.name || 'CRM Panel';
-    $('#dash-last-updated').textContent = formatDate(new Date());
+    var sidebarName = $('#sidebar-business-name');
+    if (sidebarName) {
+      sidebarName.textContent = (d.business && d.business.name) || 'CRM Panel';
+    }
+
+    $('#dash-last-loaded').textContent = formatDate(new Date());
   }
 
   // ================================================
@@ -483,7 +544,7 @@
   // ================================================
   function renderBusiness() {
     if (!contentData) return;
-    const b = contentData.business;
+    var b = contentData.business;
     $('#biz-name').value = b.name || '';
     $('#biz-tagline').value = b.tagline || '';
     $('#biz-phone').value = b.phone || '';
@@ -494,20 +555,34 @@
     $('#biz-license').value = b.license || '';
   }
 
-  function initBusinessForm() {
-    $('#form-business').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      contentData.business.name = $('#biz-name').value;
-      contentData.business.tagline = $('#biz-tagline').value;
-      contentData.business.phone = $('#biz-phone').value;
-      contentData.business.email = $('#biz-email').value;
-      contentData.business.address = $('#biz-address').value;
-      contentData.business.hours = $('#biz-hours').value;
-      contentData.business.yearEstablished = parseInt($('#biz-year').value) || 2020;
-      contentData.business.license = $('#biz-license').value;
-      await saveContent('business info');
-      renderDashboard();
+  function initBusinessBindings() {
+    var fields = {
+      'biz-name': 'name',
+      'biz-tagline': 'tagline',
+      'biz-phone': 'phone',
+      'biz-email': 'email',
+      'biz-address': 'address',
+      'biz-hours': 'hours',
+      'biz-license': 'license',
+    };
+
+    Object.keys(fields).forEach(function (id) {
+      var el = $('#' + id);
+      if (el) {
+        el.addEventListener('input', function () {
+          contentData.business[fields[id]] = el.value;
+          markDirty();
+        });
+      }
     });
+
+    var yearEl = $('#biz-year');
+    if (yearEl) {
+      yearEl.addEventListener('input', function () {
+        contentData.business.yearEstablished = parseInt(yearEl.value) || 0;
+        markDirty();
+      });
+    }
   }
 
   // ================================================
@@ -515,7 +590,7 @@
   // ================================================
   function renderHero() {
     if (!contentData) return;
-    const h = contentData.hero;
+    var h = contentData.hero;
     $('#hero-headline').value = h.headline || '';
     $('#hero-subheadline').value = h.subheadline || '';
     $('#hero-cta').value = h.cta || '';
@@ -524,56 +599,68 @@
   }
 
   function renderTrustBadges() {
-    const list = $('#hero-badges-list');
-    const badges = contentData.hero.trustBadges || [];
+    var list = $('#hero-badges-list');
+    var badges = contentData.hero.trustBadges || [];
     list.innerHTML = badges
-      .map(
-        (badge, i) => `
-      <span class="tag-item">
-        ${escapeHtml(badge)}
-        <button type="button" class="tag-remove" data-badge-index="${i}" aria-label="Remove">&times;</button>
-      </span>
-    `
-      )
+      .map(function (badge, i) {
+        return (
+          '<span class="tag-item">' +
+          escapeHtml(badge) +
+          '<button type="button" class="tag-remove" data-badge-index="' +
+          i +
+          '" aria-label="Remove">&times;</button>' +
+          '</span>'
+        );
+      })
       .join('');
   }
 
-  function initHeroForm() {
-    $('#form-hero').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      contentData.hero.headline = $('#hero-headline').value;
-      contentData.hero.subheadline = $('#hero-subheadline').value;
-      contentData.hero.cta = $('#hero-cta').value;
-      contentData.hero.ctaPhone = $('#hero-ctaphone').value;
-      await saveContent('hero section');
+  function initHeroBindings() {
+    var heroFields = {
+      'hero-headline': 'headline',
+      'hero-subheadline': 'subheadline',
+      'hero-cta': 'cta',
+      'hero-ctaphone': 'ctaPhone',
+    };
+
+    Object.keys(heroFields).forEach(function (id) {
+      var el = $('#' + id);
+      if (el) {
+        el.addEventListener('input', function () {
+          contentData.hero[heroFields[id]] = el.value;
+          markDirty();
+        });
+      }
     });
 
     // Add badge
-    $('#hero-add-badge').addEventListener('click', () => {
-      const input = $('#hero-badge-input');
-      const val = input.value.trim();
+    $('#hero-add-badge').addEventListener('click', function () {
+      var input = $('#hero-badge-input');
+      var val = input.value.trim();
       if (!val) return;
       if (!contentData.hero.trustBadges) contentData.hero.trustBadges = [];
       contentData.hero.trustBadges.push(val);
       input.value = '';
       renderTrustBadges();
+      markDirty();
     });
 
     // Enter key to add badge
-    $('#hero-badge-input').addEventListener('keydown', (e) => {
+    $('#hero-badge-input').addEventListener('keydown', function (e) {
       if (e.key === 'Enter') {
         e.preventDefault();
         $('#hero-add-badge').click();
       }
     });
 
-    // Remove badge
-    document.addEventListener('click', (e) => {
-      const btn = e.target.closest('[data-badge-index]');
+    // Remove badge (delegated)
+    document.addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-badge-index]');
       if (btn) {
-        const idx = parseInt(btn.dataset.badgeIndex);
+        var idx = parseInt(btn.dataset.badgeIndex);
         contentData.hero.trustBadges.splice(idx, 1);
         renderTrustBadges();
+        markDirty();
       }
     });
   }
@@ -583,60 +670,110 @@
   // ================================================
 
   /** Create the HTML for a collapsible item card */
-  function createItemCard(index, title, fieldsHtml, options = {}) {
-    const { section, open } = options;
-    return `
-      <div class="item-card ${open ? 'open' : ''}" data-index="${index}">
-        <div class="item-card-header">
-          <span class="item-card-title">
-            <span class="item-index">${index + 1}</span>
-            ${escapeHtml(title || 'Untitled')}
-          </span>
-          <div class="item-card-actions">
-            <button type="button" class="btn-icon danger delete-item-btn" data-section="${section}" data-index="${index}" title="Delete">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-            </button>
-            <svg class="chevron-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-          </div>
-        </div>
-        <div class="item-card-body">
-          <div class="form-grid">${fieldsHtml}</div>
-        </div>
-      </div>
-    `;
+  function createItemCard(index, title, fieldsHtml, options) {
+    options = options || {};
+    var section = options.section || '';
+    var isOpen = options.open ? ' open' : '';
+    return (
+      '<div class="item-card' +
+      isOpen +
+      '" data-index="' +
+      index +
+      '">' +
+      '<div class="item-card-header">' +
+      '<span class="item-card-title">' +
+      '<span class="item-index">' +
+      (index + 1) +
+      '</span>' +
+      escapeHtml(title || 'Untitled') +
+      '</span>' +
+      '<div class="item-card-actions">' +
+      '<button type="button" class="btn-icon danger delete-item-btn" data-section="' +
+      section +
+      '" data-index="' +
+      index +
+      '" title="Delete">' +
+      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>' +
+      '</button>' +
+      '<svg class="chevron-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>' +
+      '</div>' +
+      '</div>' +
+      '<div class="item-card-body">' +
+      '<div class="form-grid">' +
+      fieldsHtml +
+      '</div>' +
+      '</div>' +
+      '</div>'
+    );
   }
 
   /** Bind collapse/expand toggle on item card headers */
   function bindItemCardToggles(container) {
-    container.querySelectorAll('.item-card-header').forEach((header) => {
-      header.addEventListener('click', (e) => {
+    container.querySelectorAll('.item-card-header').forEach(function (header) {
+      header.addEventListener('click', function (e) {
         if (e.target.closest('.btn-icon')) return;
         header.closest('.item-card').classList.toggle('open');
       });
     });
   }
 
-  /** Generic input field generator */
-  function field(label, value, attrs = '') {
-    return `
-      <div class="form-group">
-        <label>${escapeHtml(label)}</label>
-        <input type="text" value="${escapeAttr(value || '')}" ${attrs}>
-      </div>
-    `;
+  /** Generic text input field */
+  function field(label, value, attrs) {
+    attrs = attrs || '';
+    return (
+      '<div class="form-group">' +
+      '<label>' +
+      escapeHtml(label) +
+      '</label>' +
+      '<input type="text" value="' +
+      escapeAttr(value || '') +
+      '" ' +
+      attrs +
+      '>' +
+      '</div>'
+    );
   }
 
-  function textareaField(label, value, attrs = '', rows = 3) {
-    return `
-      <div class="form-group full-width">
-        <label>${escapeHtml(label)}</label>
-        <textarea rows="${rows}" ${attrs}>${escapeHtml(value || '')}</textarea>
-      </div>
-    `;
+  /** Generic textarea field */
+  function textareaField(label, value, attrs, rows) {
+    attrs = attrs || '';
+    rows = rows || 3;
+    return (
+      '<div class="form-group full-width">' +
+      '<label>' +
+      escapeHtml(label) +
+      '</label>' +
+      '<textarea rows="' +
+      rows +
+      '" ' +
+      attrs +
+      '>' +
+      escapeHtml(value || '') +
+      '</textarea>' +
+      '</div>'
+    );
   }
 
-  function escapeAttr(str) {
-    return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  /** Bind inputs in an item list container to update contentData[section][index][key] */
+  function bindItemInputs(container, section) {
+    container.querySelectorAll('input, textarea').forEach(function (input) {
+      if (input.dataset.subsection) return; // handled separately
+      input.addEventListener('input', function () {
+        var idx = parseInt(input.dataset.index);
+        var key = input.dataset.key;
+        if (key === undefined || isNaN(idx)) return;
+
+        var arr = contentData[section];
+        if (arr && arr[idx]) {
+          var val = input.value;
+          if (input.dataset.type === 'number') {
+            val = parseFloat(val) || 0;
+          }
+          arr[idx][key] = val;
+          markDirty();
+        }
+      });
+    });
   }
 
   // ================================================
@@ -644,25 +781,34 @@
   // ================================================
   function renderStats() {
     if (!contentData) return;
-    const list = $('#stats-list');
-    const stats = contentData.stats || [];
+    var list = $('#stats-list');
+    var stats = contentData.stats || [];
 
     if (stats.length === 0) {
-      list.innerHTML = '<div class="empty-state">No stats yet. Click "Add Stat" to create one.</div>';
+      list.innerHTML =
+        '<div class="empty-state">No stats yet. Click "Add Stat" to create one.</div>';
       return;
     }
 
     list.innerHTML = stats
-      .map((stat, i) => {
-        const fields = `
-          ${field('Number', stat.number, `data-key="number" data-index="${i}" data-type="number"`)}
-          ${field('Suffix', stat.suffix, `data-key="suffix" data-index="${i}"`)}
-          <div class="form-group full-width">
-            <label>Label</label>
-            <input type="text" value="${escapeAttr(stat.label || '')}" data-key="label" data-index="${i}">
-          </div>
-        `;
-        return createItemCard(i, `${stat.number}${stat.suffix} ${stat.label}`, fields, { section: 'stats' });
+      .map(function (stat, i) {
+        var fields =
+          field('Number', stat.number, 'data-key="number" data-index="' + i + '" data-type="number"') +
+          field('Suffix', stat.suffix, 'data-key="suffix" data-index="' + i + '"') +
+          '<div class="form-group full-width">' +
+          '<label>Label</label>' +
+          '<input type="text" value="' +
+          escapeAttr(stat.label || '') +
+          '" data-key="label" data-index="' +
+          i +
+          '">' +
+          '</div>';
+        return createItemCard(
+          i,
+          stat.number + (stat.suffix || '') + ' ' + (stat.label || ''),
+          fields,
+          { section: 'stats' }
+        );
       })
       .join('');
 
@@ -671,12 +817,13 @@
   }
 
   function initStats() {
-    $('#add-stat-btn').addEventListener('click', () => {
+    $('#add-stat-btn').addEventListener('click', function () {
       if (!contentData.stats) contentData.stats = [];
       contentData.stats.push({ number: 0, suffix: '+', label: 'New Stat' });
       renderStats();
+      markDirty();
       // Open the last card
-      const cards = $$('.item-card', $('#stats-list'));
+      var cards = $$('.item-card', $('#stats-list'));
       if (cards.length) cards[cards.length - 1].classList.add('open');
     });
   }
@@ -686,23 +833,27 @@
   // ================================================
   function renderServices() {
     if (!contentData) return;
-    const list = $('#services-list');
-    const services = contentData.services || [];
+    var list = $('#services-list');
+    var services = contentData.services || [];
 
     if (services.length === 0) {
-      list.innerHTML = '<div class="empty-state">No services yet. Click "Add Service" to create one.</div>';
+      list.innerHTML =
+        '<div class="empty-state">No services yet. Click "Add Service" to create one.</div>';
       return;
     }
 
     list.innerHTML = services
-      .map((svc, i) => {
-        const fields = `
-          ${field('ID (slug)', svc.id, `data-key="id" data-index="${i}"`)}
-          ${field('Title', svc.title, `data-key="title" data-index="${i}"`)}
-          ${field('Icon', svc.icon, `data-key="icon" data-index="${i}"`)}
-          ${field('Image Path', svc.image, `data-key="image" data-index="${i}"`)}
-          ${textareaField('Description', svc.description, `data-key="description" data-index="${i}"`)}
-        `;
+      .map(function (svc, i) {
+        var fields =
+          field('ID (slug)', svc.id, 'data-key="id" data-index="' + i + '"') +
+          field('Title', svc.title, 'data-key="title" data-index="' + i + '"') +
+          field('Icon', svc.icon, 'data-key="icon" data-index="' + i + '"') +
+          field('Image Path', svc.image, 'data-key="image" data-index="' + i + '"') +
+          textareaField(
+            'Description',
+            svc.description,
+            'data-key="description" data-index="' + i + '"'
+          );
         return createItemCard(i, svc.title, fields, { section: 'services' });
       })
       .join('');
@@ -712,7 +863,7 @@
   }
 
   function initServices() {
-    $('#add-service-btn').addEventListener('click', () => {
+    $('#add-service-btn').addEventListener('click', function () {
       if (!contentData.services) contentData.services = [];
       contentData.services.push({
         id: 'new-service',
@@ -722,7 +873,8 @@
         image: 'images/placeholder.png',
       });
       renderServices();
-      const cards = $$('.item-card', $('#services-list'));
+      markDirty();
+      var cards = $$('.item-card', $('#services-list'));
       if (cards.length) cards[cards.length - 1].classList.add('open');
     });
   }
@@ -732,22 +884,22 @@
   // ================================================
   function renderGallery() {
     if (!contentData) return;
-    const list = $('#gallery-list');
-    const gallery = contentData.gallery || [];
+    var list = $('#gallery-list');
+    var gallery = contentData.gallery || [];
 
     if (gallery.length === 0) {
-      list.innerHTML = '<div class="empty-state">No gallery items yet. Click "Add Gallery Item" to create one.</div>';
+      list.innerHTML =
+        '<div class="empty-state">No gallery items yet. Click "Add Gallery Item" to create one.</div>';
       return;
     }
 
     list.innerHTML = gallery
-      .map((item, i) => {
-        const fields = `
-          ${field('Before Image Path', item.before, `data-key="before" data-index="${i}"`)}
-          ${field('After Image Path', item.after, `data-key="after" data-index="${i}"`)}
-          ${field('Caption', item.caption, `data-key="caption" data-index="${i}"`)}
-          ${field('Category', item.category, `data-key="category" data-index="${i}"`)}
-        `;
+      .map(function (item, i) {
+        var fields =
+          field('Before Image Path', item.before, 'data-key="before" data-index="' + i + '"') +
+          field('After Image Path', item.after, 'data-key="after" data-index="' + i + '"') +
+          field('Caption', item.caption, 'data-key="caption" data-index="' + i + '"') +
+          field('Category', item.category, 'data-key="category" data-index="' + i + '"');
         return createItemCard(i, item.caption, fields, { section: 'gallery' });
       })
       .join('');
@@ -757,7 +909,7 @@
   }
 
   function initGallery() {
-    $('#add-gallery-btn').addEventListener('click', () => {
+    $('#add-gallery-btn').addEventListener('click', function () {
       if (!contentData.gallery) contentData.gallery = [];
       contentData.gallery.push({
         before: 'images/before.png',
@@ -766,7 +918,8 @@
         category: 'general',
       });
       renderGallery();
-      const cards = $$('.item-card', $('#gallery-list'));
+      markDirty();
+      var cards = $$('.item-card', $('#gallery-list'));
       if (cards.length) cards[cards.length - 1].classList.add('open');
     });
   }
@@ -776,35 +929,49 @@
   // ================================================
   function renderTestimonials() {
     if (!contentData) return;
-    const list = $('#testimonials-list');
-    const testimonials = contentData.testimonials || [];
+    var list = $('#testimonials-list');
+    var testimonials = contentData.testimonials || [];
 
     if (testimonials.length === 0) {
-      list.innerHTML = '<div class="empty-state">No testimonials yet. Click "Add Testimonial" to create one.</div>';
+      list.innerHTML =
+        '<div class="empty-state">No testimonials yet. Click "Add Testimonial" to create one.</div>';
       return;
     }
 
     list.innerHTML = testimonials
-      .map((t, i) => {
-        const starsHtml = `
-          <div class="form-group">
-            <label>Rating</label>
-            <div class="star-rating-input" data-index="${i}">
-              ${[1, 2, 3, 4, 5]
-                .map(
-                  (n) =>
-                    `<button type="button" class="star-btn ${n <= (t.rating || 5) ? 'active' : ''}" data-rating="${n}" data-index="${i}">&#9733;</button>`
-                )
-                .join('')}
-            </div>
-          </div>
-        `;
-        const fields = `
-          ${field('Customer Name', t.name, `data-key="name" data-index="${i}"`)}
-          ${starsHtml}
-          ${field('Service', t.service, `data-key="service" data-index="${i}"`)}
-          ${textareaField('Testimonial Text', t.text, `data-key="text" data-index="${i}"`, 4)}
-        `;
+      .map(function (t, i) {
+        var starsHtml =
+          '<div class="form-group">' +
+          '<label>Rating</label>' +
+          '<div class="star-rating-input" data-index="' +
+          i +
+          '">' +
+          [1, 2, 3, 4, 5]
+            .map(function (n) {
+              return (
+                '<button type="button" class="star-btn ' +
+                (n <= (t.rating || 5) ? 'active' : '') +
+                '" data-rating="' +
+                n +
+                '" data-index="' +
+                i +
+                '">&#9733;</button>'
+              );
+            })
+            .join('') +
+          '</div>' +
+          '</div>';
+
+        var fields =
+          field('Customer Name', t.name, 'data-key="name" data-index="' + i + '"') +
+          starsHtml +
+          field('Service', t.service, 'data-key="service" data-index="' + i + '"') +
+          textareaField(
+            'Testimonial Text',
+            t.text,
+            'data-key="text" data-index="' + i + '"',
+            4
+          );
         return createItemCard(i, t.name, fields, { section: 'testimonials' });
       })
       .join('');
@@ -813,15 +980,16 @@
     bindItemInputs(list, 'testimonials');
 
     // Star rating clicks
-    list.querySelectorAll('.star-btn').forEach((btn) => {
-      btn.addEventListener('click', (e) => {
+    list.querySelectorAll('.star-btn').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
         e.stopPropagation();
-        const idx = parseInt(btn.dataset.index);
-        const rating = parseInt(btn.dataset.rating);
+        var idx = parseInt(btn.dataset.index);
+        var rating = parseInt(btn.dataset.rating);
         contentData.testimonials[idx].rating = rating;
+        markDirty();
         // Update UI
-        const container = btn.closest('.star-rating-input');
-        container.querySelectorAll('.star-btn').forEach((s) => {
+        var container = btn.closest('.star-rating-input');
+        container.querySelectorAll('.star-btn').forEach(function (s) {
           s.classList.toggle('active', parseInt(s.dataset.rating) <= rating);
         });
       });
@@ -829,7 +997,7 @@
   }
 
   function initTestimonials() {
-    $('#add-testimonial-btn').addEventListener('click', () => {
+    $('#add-testimonial-btn').addEventListener('click', function () {
       if (!contentData.testimonials) contentData.testimonials = [];
       contentData.testimonials.push({
         name: 'New Customer',
@@ -838,7 +1006,8 @@
         service: 'House Washing',
       });
       renderTestimonials();
-      const cards = $$('.item-card', $('#testimonials-list'));
+      markDirty();
+      var cards = $$('.item-card', $('#testimonials-list'));
       if (cards.length) cards[cards.length - 1].classList.add('open');
     });
   }
@@ -848,23 +1017,32 @@
   // ================================================
   function renderFaq() {
     if (!contentData) return;
-    const list = $('#faq-list');
-    const faq = contentData.faq || [];
+    var list = $('#faq-list');
+    var faq = contentData.faq || [];
 
     if (faq.length === 0) {
-      list.innerHTML = '<div class="empty-state">No FAQ items yet. Click "Add FAQ" to create one.</div>';
+      list.innerHTML =
+        '<div class="empty-state">No FAQ items yet. Click "Add FAQ" to create one.</div>';
       return;
     }
 
     list.innerHTML = faq
-      .map((item, i) => {
-        const fields = `
-          <div class="form-group full-width">
-            <label>Question</label>
-            <input type="text" value="${escapeAttr(item.question || '')}" data-key="question" data-index="${i}">
-          </div>
-          ${textareaField('Answer', item.answer, `data-key="answer" data-index="${i}"`, 4)}
-        `;
+      .map(function (item, i) {
+        var fields =
+          '<div class="form-group full-width">' +
+          '<label>Question</label>' +
+          '<input type="text" value="' +
+          escapeAttr(item.question || '') +
+          '" data-key="question" data-index="' +
+          i +
+          '">' +
+          '</div>' +
+          textareaField(
+            'Answer',
+            item.answer,
+            'data-key="answer" data-index="' + i + '"',
+            4
+          );
         return createItemCard(i, item.question, fields, { section: 'faq' });
       })
       .join('');
@@ -874,14 +1052,15 @@
   }
 
   function initFaq() {
-    $('#add-faq-btn').addEventListener('click', () => {
+    $('#add-faq-btn').addEventListener('click', function () {
       if (!contentData.faq) contentData.faq = [];
       contentData.faq.push({
         question: 'New Question?',
         answer: '',
       });
       renderFaq();
-      const cards = $$('.item-card', $('#faq-list'));
+      markDirty();
+      var cards = $$('.item-card', $('#faq-list'));
       if (cards.length) cards[cards.length - 1].classList.add('open');
     });
   }
@@ -891,30 +1070,38 @@
   // ================================================
   function renderAbout() {
     if (!contentData) return;
-    const about = contentData.about;
+    var about = contentData.about;
     $('#about-headline').value = about.headline || '';
     $('#about-description').value = about.description || '';
     renderValues();
   }
 
   function renderValues() {
-    const list = $('#values-list');
-    const values = contentData.about.values || [];
+    var list = $('#values-list');
+    var values = contentData.about.values || [];
 
     if (values.length === 0) {
-      list.innerHTML = '<div class="empty-state">No values yet. Click "Add Value" to create one.</div>';
+      list.innerHTML =
+        '<div class="empty-state">No values yet. Click "Add Value" to create one.</div>';
       return;
     }
 
     list.innerHTML = values
-      .map((v, i) => {
-        const fields = `
-          <div class="form-group full-width">
-            <label>Title</label>
-            <input type="text" value="${escapeAttr(v.title || '')}" data-key="title" data-index="${i}" data-subsection="values">
-          </div>
-          ${textareaField('Description', v.description, `data-key="description" data-index="${i}" data-subsection="values"`)}
-        `;
+      .map(function (v, i) {
+        var fields =
+          '<div class="form-group full-width">' +
+          '<label>Title</label>' +
+          '<input type="text" value="' +
+          escapeAttr(v.title || '') +
+          '" data-key="title" data-index="' +
+          i +
+          '" data-subsection="values">' +
+          '</div>' +
+          textareaField(
+            'Description',
+            v.description,
+            'data-key="description" data-index="' + i + '" data-subsection="values"'
+          );
         return createItemCard(i, v.title, fields, { section: 'values' });
       })
       .join('');
@@ -922,59 +1109,39 @@
     bindItemCardToggles(list);
 
     // Bind value inputs
-    list.querySelectorAll('input, textarea').forEach((input) => {
-      input.addEventListener('input', () => {
-        const idx = parseInt(input.dataset.index);
-        const key = input.dataset.key;
+    list.querySelectorAll('input, textarea').forEach(function (input) {
+      input.addEventListener('input', function () {
+        var idx = parseInt(input.dataset.index);
+        var key = input.dataset.key;
         if (contentData.about.values[idx]) {
           contentData.about.values[idx][key] = input.value;
+          markDirty();
         }
       });
     });
   }
 
   function initAbout() {
-    // About headline/description are saved via the save button
-    // Bind live updates
-    $('#about-headline').addEventListener('input', (e) => {
+    // Bind live updates for about headline/description
+    $('#about-headline').addEventListener('input', function (e) {
       contentData.about.headline = e.target.value;
+      markDirty();
     });
-    $('#about-description').addEventListener('input', (e) => {
+    $('#about-description').addEventListener('input', function (e) {
       contentData.about.description = e.target.value;
+      markDirty();
     });
 
-    $('#add-value-btn').addEventListener('click', () => {
+    $('#add-value-btn').addEventListener('click', function () {
       if (!contentData.about.values) contentData.about.values = [];
       contentData.about.values.push({
         title: 'New Value',
         description: '',
       });
       renderValues();
-      const cards = $$('.item-card', $('#values-list'));
+      markDirty();
+      var cards = $$('.item-card', $('#values-list'));
       if (cards.length) cards[cards.length - 1].classList.add('open');
-    });
-  }
-
-  // ================================================
-  // GENERIC ITEM INPUT BINDINGS
-  // ================================================
-  function bindItemInputs(container, section) {
-    container.querySelectorAll('input, textarea').forEach((input) => {
-      if (input.dataset.subsection) return; // handled separately (about values)
-      input.addEventListener('input', () => {
-        const idx = parseInt(input.dataset.index);
-        const key = input.dataset.key;
-        if (key === undefined || isNaN(idx)) return;
-
-        const arr = contentData[section];
-        if (arr && arr[idx]) {
-          let val = input.value;
-          if (input.dataset.type === 'number') {
-            val = parseFloat(val) || 0;
-          }
-          arr[idx][key] = val;
-        }
-      });
     });
   }
 
@@ -982,156 +1149,70 @@
   // DELETE ITEMS
   // ================================================
   function initDeleteHandler() {
-    document.addEventListener('click', (e) => {
-      const btn = e.target.closest('.delete-item-btn');
+    document.addEventListener('click', function (e) {
+      var btn = e.target.closest('.delete-item-btn');
       if (!btn) return;
       e.stopPropagation();
 
-      const section = btn.dataset.section;
-      const index = parseInt(btn.dataset.index);
+      var section = btn.dataset.section;
+      var index = parseInt(btn.dataset.index);
 
+      // Values (nested under about)
       if (section === 'values') {
         if (!confirm('Delete this value?')) return;
         contentData.about.values.splice(index, 1);
         renderValues();
+        markDirty();
         return;
       }
 
-      const sectionData = contentData[section];
+      // Top-level arrays
+      var sectionData = contentData[section];
       if (!sectionData) return;
 
-      if (!confirm(`Delete this ${section.slice(0, -1) || 'item'}?`)) return;
+      var singularNames = {
+        stats: 'stat',
+        services: 'service',
+        gallery: 'gallery item',
+        testimonials: 'testimonial',
+        faq: 'FAQ item',
+      };
+      var itemName = singularNames[section] || 'item';
+
+      if (!confirm('Delete this ' + itemName + '?')) return;
       sectionData.splice(index, 1);
       renderCurrentSection();
+      markDirty();
     });
   }
 
   // ================================================
-  // IMAGE MANAGER
+  // SETTINGS (disconnect)
   // ================================================
-  async function renderImages() {
-    const grid = $('#images-grid');
-    grid.innerHTML = '<div class="empty-state"><div class="loading-spinner"></div><p>Loading images...</p></div>';
-
-    try {
-      const files = await listDir(IMAGES_DIR);
-      const imageFiles = files.filter((f) =>
-        f.type === 'file' && /\.(png|jpg|jpeg|gif|svg|webp)$/i.test(f.name)
-      );
-
-      if (imageFiles.length === 0) {
-        grid.innerHTML = `
-          <div class="empty-state images-empty">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            <p>No images found. Upload your first image!</p>
-          </div>
-        `;
-        return;
-      }
-
-      grid.innerHTML = imageFiles
-        .map((file) => {
-          const thumbUrl = file.download_url || '';
-          return `
-            <div class="image-card">
-              <img class="image-card-thumb" src="${thumbUrl}" alt="${escapeAttr(file.name)}" loading="lazy" onerror="this.style.display='none'">
-              <div class="image-card-info">
-                <div class="image-card-name">${escapeHtml(file.name)}</div>
-                <div class="image-card-path">${IMAGES_DIR}/${file.name}</div>
-              </div>
-            </div>
-          `;
-        })
-        .join('');
-    } catch (err) {
-      grid.innerHTML = `<div class="empty-state">Failed to load images: ${escapeHtml(err.message)}</div>`;
+  function initSettings() {
+    var disconnectBtn = $('#settings-disconnect-btn');
+    if (disconnectBtn) {
+      disconnectBtn.addEventListener('click', function () {
+        if (!confirm('Disconnect from GitHub? You will need to re-enter your token.')) return;
+        clearToken();
+        contentData = null;
+        originalData = null;
+        contentSha = null;
+        hasUnsavedChanges = false;
+        showSetup();
+        showToast('Disconnected', 'info');
+      });
     }
-  }
-
-  function initImageUpload() {
-    const input = $('#image-upload-input');
-    const progress = $('#upload-progress');
-    const progressFill = $('#upload-progress-fill');
-    const progressText = $('#upload-progress-text');
-
-    input.addEventListener('change', async () => {
-      const file = input.files[0];
-      if (!file) return;
-
-      // Validate
-      if (!file.type.startsWith('image/')) {
-        showToast('Please select an image file', 'error');
-        input.value = '';
-        return;
-      }
-      if (file.size > 10 * 1024 * 1024) {
-        showToast('Image must be smaller than 10MB', 'error');
-        input.value = '';
-        return;
-      }
-
-      // Read file as base64
-      const reader = new FileReader();
-      reader.onload = async () => {
-        const base64Full = reader.result;
-        // Strip the data:image/...;base64, prefix
-        const base64Content = base64Full.split(',')[1];
-        const fileName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-        const filePath = `${IMAGES_DIR}/${fileName}`;
-
-        progress.style.display = 'block';
-        progressFill.style.width = '30%';
-        progressText.textContent = `Uploading ${fileName}...`;
-
-        try {
-          // Check if file already exists (get SHA)
-          let existingSha = null;
-          try {
-            const existing = await fetchFile(filePath);
-            existingSha = existing.sha;
-          } catch {
-            // File doesn't exist, that's fine
-          }
-
-          progressFill.style.width = '60%';
-
-          await putFile(
-            filePath,
-            base64Content,
-            `Upload image ${fileName} via CRM`,
-            existingSha,
-            true // content is already base64
-          );
-
-          progressFill.style.width = '100%';
-          progressText.textContent = 'Upload complete!';
-          showToast(`Image "${fileName}" uploaded successfully`, 'success');
-
-          // Refresh images grid
-          setTimeout(() => {
-            progress.style.display = 'none';
-            progressFill.style.width = '0%';
-            renderImages();
-          }, 1000);
-        } catch (err) {
-          showToast('Upload failed: ' + err.message, 'error');
-          progress.style.display = 'none';
-          progressFill.style.width = '0%';
-        }
-      };
-      reader.readAsDataURL(file);
-      input.value = '';
-    });
   }
 
   // ================================================
   // INIT
   // ================================================
   function init() {
-    initAuth();
+    initSetup();
     initNavigation();
-    initBusinessForm();
-    initHeroForm();
+    initBusinessBindings();
+    initHeroBindings();
     initStats();
     initServices();
     initGallery();
@@ -1139,7 +1220,15 @@
     initFaq();
     initAbout();
     initDeleteHandler();
-    initImageUpload();
+    initSettings();
+
+    // Check if already connected
+    if (isConnected()) {
+      showApp();
+      loadContent();
+    } else {
+      showSetup();
+    }
   }
 
   // Run when DOM ready

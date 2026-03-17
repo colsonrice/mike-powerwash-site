@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin CRM | Suds Away Pro Wash</title>
+  <title>Admin CRM | Content Manager</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -12,56 +12,63 @@
 <body>
 
   <!-- ============================================ -->
-  <!-- LOGIN SCREEN                                  -->
+  <!-- SETUP SCREEN (one-time)                       -->
   <!-- ============================================ -->
-  <div id="login-screen" class="login-screen">
-    <div class="login-card">
-      <div class="login-logo">
+  <div id="setup-screen" class="setup-screen" style="display:none;">
+    <div class="setup-card">
+      <div class="setup-header">
         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ff6b35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 2L2 7l10 5 10-5-10-5z"/>
           <path d="M2 17l10 5 10-5"/>
           <path d="M2 12l10 5 10-5"/>
         </svg>
-        <h1>Suds Away Pro Wash</h1>
-        <p class="login-subtitle">Content Management System</p>
+        <h1>Welcome to Your Website Manager</h1>
+        <p class="setup-subtitle">Let's connect your admin panel to your website. This only takes a minute and you'll never need to do it again.</p>
       </div>
-      <form id="login-form" autocomplete="off">
-        <div class="form-group">
-          <label for="gh-token">GitHub Personal Access Token</label>
-          <div class="token-input-wrap">
-            <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxx" required>
-            <button type="button" class="toggle-vis" id="toggle-token-vis" aria-label="Toggle visibility">
-              <svg class="eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-              <svg class="eye-off-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-            </button>
+
+      <div class="setup-steps">
+        <div class="setup-step">
+          <span class="step-num">1</span>
+          <div>
+            <strong>Create a GitHub token</strong>
+            <p><a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">Click here to create one</a>. Name it <code>Suds Away CRM</code>, set expiration to <strong>No expiration</strong>.</p>
           </div>
         </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="repo-owner">Repo Owner</label>
-            <input type="text" id="repo-owner" placeholder="colsonrice" value="colsonrice">
-          </div>
-          <div class="form-group">
-            <label for="repo-name">Repo Name</label>
-            <input type="text" id="repo-name" placeholder="mike-powerwash-site" value="mike-powerwash-site">
+        <div class="setup-step">
+          <span class="step-num">2</span>
+          <div>
+            <strong>Select your repository</strong>
+            <p>Under "Repository access", select <strong>Only select repositories</strong>, then choose <code>mike-powerwash-site</code>.</p>
           </div>
         </div>
-        <button type="submit" class="btn btn-primary btn-full" id="login-btn">
-          <span class="btn-text">Sign In</span>
-          <span class="btn-loader" style="display:none;">
-            <span class="spinner"></span> Authenticating...
-          </span>
-        </button>
-        <p class="login-help">
-          Need a token? <a href="https://github.com/settings/tokens/new" target="_blank" rel="noopener">Create one on GitHub</a> with <code>repo</code> scope.
-        </p>
+        <div class="setup-step">
+          <span class="step-num">3</span>
+          <div>
+            <strong>Set permissions</strong>
+            <p>Under "Permissions" &rarr; "Repository permissions", set <strong>Contents</strong> to <strong>Read and write</strong>. Click <strong>Generate token</strong>.</p>
+          </div>
+        </div>
+        <div class="setup-step">
+          <span class="step-num">4</span>
+          <div>
+            <strong>Paste your token below</strong>
+            <p>Copy the token and paste it here. It will be saved in your browser.</p>
+          </div>
+        </div>
+      </div>
+
+      <form id="setup-form" autocomplete="off">
+        <div class="setup-input-row">
+          <input type="password" id="setup-token" placeholder="github_pat_xxxxxxxxxxxx" required>
+          <button type="button" id="toggle-token-vis" class="btn btn-ghost btn-sm">Show</button>
+        </div>
+        <button type="submit" id="setup-connect-btn" class="btn btn-primary btn-full">Connect</button>
+        <p class="setup-note">Your token is stored only in this browser and never shared.</p>
       </form>
     </div>
   </div>
 
-  <!-- ============================================ -->
-  <!-- MAIN APP SHELL                                -->
-  <!-- ============================================ -->
+  <!-- APP SHELL -->
   <div id="app-shell" class="app-shell" style="display:none;">
 
     <!-- SIDEBAR -->
@@ -75,7 +82,7 @@
           </svg>
           <div>
             <span class="brand-name">CRM Panel</span>
-            <span class="brand-sub" id="sidebar-business-name">Suds Away Pro Wash</span>
+            <span class="brand-sub" id="sidebar-business-name">Loading...</span>
           </div>
         </div>
         <button class="sidebar-close" id="sidebar-close" aria-label="Close sidebar">
@@ -139,21 +146,15 @@
               <span>About</span>
             </a>
           </li>
-          <li>
-            <a href="#" class="nav-link" data-section="images">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2z"/><polyline points="16 3 16 9 12 7 8 9 8 3"/></svg>
-              <span>Images</span>
-            </a>
-          </li>
         </ul>
       </nav>
 
       <div class="sidebar-footer">
-        <div class="sidebar-repo" id="sidebar-repo-info">colsonrice/mike-powerwash-site</div>
-        <button class="btn btn-ghost btn-sm" id="logout-btn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-          Sign Out
-        </button>
+        <div class="sidebar-mode">
+          <span id="settings-status-dot" style="width:8px;height:8px;border-radius:50%;background:var(--success);flex-shrink:0;"></span>
+          <span id="settings-status-text">Connected</span>
+        </div>
+        <button id="settings-disconnect-btn" class="btn btn-ghost btn-sm" style="margin-top:0.5rem;font-size:0.72rem;padding:0.3rem 0.6rem;color:rgba(255,255,255,0.4);">Disconnect</button>
       </div>
     </aside>
 
@@ -163,9 +164,9 @@
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
       <span class="mobile-title" id="mobile-page-title">Dashboard</span>
-      <button class="btn btn-ghost btn-sm" id="mobile-logout-btn" aria-label="Sign out">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      </button>
+      <div class="mobile-save-indicator" id="mobile-save-indicator" style="display:none;">
+        <span class="unsaved-dot"></span>
+      </div>
     </header>
 
     <!-- SIDEBAR OVERLAY (mobile) -->
@@ -175,7 +176,7 @@
     <main class="main-content" id="main-content">
 
       <!-- LOADING OVERLAY -->
-      <div class="loading-overlay" id="loading-overlay" style="display:none;">
+      <div class="loading-overlay" id="loading-overlay">
         <div class="loading-spinner-wrap">
           <div class="loading-spinner"></div>
           <p id="loading-text">Loading content...</p>
@@ -185,8 +186,44 @@
       <!-- ====== DASHBOARD ====== -->
       <section class="page" id="page-dashboard">
         <div class="page-header">
-          <h2>Dashboard</h2>
-          <p class="page-desc">Overview of your website content</p>
+          <div>
+            <h2>Dashboard</h2>
+            <p class="page-desc">Overview of your website content</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-primary" id="global-save-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Save Changes
+            </button>
+          </div>
+        </div>
+
+        <!-- INFO BANNER -->
+        <div class="info-banner" id="info-banner">
+          <div class="info-banner-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          </div>
+          <div class="info-banner-content">
+            <strong>How this works:</strong> Edit your content below, then click <strong>Save Changes</strong>. Your website will automatically update in about 30 seconds.
+          </div>
+          <button class="info-banner-close" id="info-banner-close" aria-label="Dismiss">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+
+        <!-- UNSAVED CHANGES BAR -->
+        <div class="unsaved-bar" id="unsaved-bar" style="display:none;">
+          <div class="unsaved-bar-content">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span>You have unsaved changes</span>
+          </div>
+          <div class="unsaved-bar-actions">
+            <button class="btn btn-ghost btn-sm" id="unsaved-reset-btn">Reset</button>
+            <button class="btn btn-primary btn-sm" id="unsaved-save-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Save Changes
+            </button>
+          </div>
         </div>
 
         <div class="stats-grid" id="dashboard-stats">
@@ -242,11 +279,11 @@
               <button class="btn btn-outline btn-sm" data-nav="business">Edit Business Info</button>
               <button class="btn btn-outline btn-sm" data-nav="hero">Edit Hero Section</button>
               <button class="btn btn-outline btn-sm" data-nav="services">Manage Services</button>
-              <button class="btn btn-outline btn-sm" data-nav="images">Upload Images</button>
+              <button class="btn btn-outline btn-sm" data-nav="testimonials">Manage Testimonials</button>
             </div>
             <div class="info-row" style="margin-top:1rem;">
-              <span class="info-label">Last Fetched</span>
-              <span class="info-value" id="dash-last-updated">--</span>
+              <span class="info-label">Content Loaded</span>
+              <span class="info-value" id="dash-last-loaded">--</span>
             </div>
           </div>
         </div>
@@ -255,10 +292,19 @@
       <!-- ====== BUSINESS INFO ====== -->
       <section class="page" id="page-business" style="display:none;">
         <div class="page-header">
-          <h2>Business Information</h2>
-          <p class="page-desc">Core details about your business</p>
+          <div>
+            <h2>Business Information</h2>
+            <p class="page-desc">Core details about your business</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-ghost btn-sm reset-section-btn" data-section="business">Reset</button>
+            <button class="btn btn-primary btn-sm save-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Save Changes
+            </button>
+          </div>
         </div>
-        <form id="form-business" class="content-form">
+        <div class="content-form">
           <div class="form-grid">
             <div class="form-group">
               <label for="biz-name">Business Name</label>
@@ -293,23 +339,25 @@
               <input type="text" id="biz-license" data-field="business.license">
             </div>
           </div>
-          <div class="form-actions">
-            <button type="submit" class="btn btn-primary">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-              Save &amp; Commit
-            </button>
-            <button type="button" class="btn btn-ghost cancel-btn">Cancel</button>
-          </div>
-        </form>
+        </div>
       </section>
 
       <!-- ====== HERO SECTION ====== -->
       <section class="page" id="page-hero" style="display:none;">
         <div class="page-header">
-          <h2>Hero Section</h2>
-          <p class="page-desc">Main banner content on the homepage</p>
+          <div>
+            <h2>Hero Section</h2>
+            <p class="page-desc">Main banner content on the homepage</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-ghost btn-sm reset-section-btn" data-section="hero">Reset</button>
+            <button class="btn btn-primary btn-sm save-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Save Changes
+            </button>
+          </div>
         </div>
-        <form id="form-hero" class="content-form">
+        <div class="content-form">
           <div class="form-grid">
             <div class="form-group full-width">
               <label for="hero-headline">Headline</label>
@@ -328,7 +376,7 @@
               <input type="text" id="hero-ctaphone" data-field="hero.ctaPhone">
             </div>
           </div>
-          <div class="form-group full-width">
+          <div class="form-group full-width" style="margin-top:0.5rem;">
             <label>Trust Badges</label>
             <div id="hero-badges-list" class="tag-list"></div>
             <div class="inline-add">
@@ -336,14 +384,7 @@
               <button type="button" class="btn btn-outline btn-sm" id="hero-add-badge">Add</button>
             </div>
           </div>
-          <div class="form-actions">
-            <button type="submit" class="btn btn-primary">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-              Save &amp; Commit
-            </button>
-            <button type="button" class="btn btn-ghost cancel-btn">Cancel</button>
-          </div>
-        </form>
+        </div>
       </section>
 
       <!-- ====== STATS ====== -->
@@ -353,19 +394,19 @@
             <h2>Stats</h2>
             <p class="page-desc">Key numbers displayed on the homepage</p>
           </div>
-          <button class="btn btn-primary btn-sm" id="add-stat-btn">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Add Stat
-          </button>
+          <div class="header-actions">
+            <button class="btn btn-outline btn-sm" id="add-stat-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add Stat
+            </button>
+            <button class="btn btn-ghost btn-sm reset-section-btn" data-section="stats">Reset</button>
+            <button class="btn btn-primary btn-sm save-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Save Changes
+            </button>
+          </div>
         </div>
         <div id="stats-list" class="items-list"></div>
-        <div class="form-actions">
-          <button type="button" class="btn btn-primary save-section-btn" data-section="stats">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-            Save &amp; Commit
-          </button>
-          <button type="button" class="btn btn-ghost cancel-btn">Cancel</button>
-        </div>
       </section>
 
       <!-- ====== SERVICES ====== -->
@@ -375,19 +416,19 @@
             <h2>Services</h2>
             <p class="page-desc">Your power washing services</p>
           </div>
-          <button class="btn btn-primary btn-sm" id="add-service-btn">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Add Service
-          </button>
+          <div class="header-actions">
+            <button class="btn btn-outline btn-sm" id="add-service-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add Service
+            </button>
+            <button class="btn btn-ghost btn-sm reset-section-btn" data-section="services">Reset</button>
+            <button class="btn btn-primary btn-sm save-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Save Changes
+            </button>
+          </div>
         </div>
         <div id="services-list" class="items-list"></div>
-        <div class="form-actions">
-          <button type="button" class="btn btn-primary save-section-btn" data-section="services">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-            Save &amp; Commit
-          </button>
-          <button type="button" class="btn btn-ghost cancel-btn">Cancel</button>
-        </div>
       </section>
 
       <!-- ====== GALLERY ====== -->
@@ -397,19 +438,19 @@
             <h2>Gallery</h2>
             <p class="page-desc">Before/after project photos</p>
           </div>
-          <button class="btn btn-primary btn-sm" id="add-gallery-btn">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Add Gallery Item
-          </button>
+          <div class="header-actions">
+            <button class="btn btn-outline btn-sm" id="add-gallery-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add Gallery Item
+            </button>
+            <button class="btn btn-ghost btn-sm reset-section-btn" data-section="gallery">Reset</button>
+            <button class="btn btn-primary btn-sm save-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Save Changes
+            </button>
+          </div>
         </div>
         <div id="gallery-list" class="items-list"></div>
-        <div class="form-actions">
-          <button type="button" class="btn btn-primary save-section-btn" data-section="gallery">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-            Save &amp; Commit
-          </button>
-          <button type="button" class="btn btn-ghost cancel-btn">Cancel</button>
-        </div>
       </section>
 
       <!-- ====== TESTIMONIALS ====== -->
@@ -419,19 +460,19 @@
             <h2>Testimonials</h2>
             <p class="page-desc">Customer reviews and feedback</p>
           </div>
-          <button class="btn btn-primary btn-sm" id="add-testimonial-btn">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Add Testimonial
-          </button>
+          <div class="header-actions">
+            <button class="btn btn-outline btn-sm" id="add-testimonial-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add Testimonial
+            </button>
+            <button class="btn btn-ghost btn-sm reset-section-btn" data-section="testimonials">Reset</button>
+            <button class="btn btn-primary btn-sm save-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Save Changes
+            </button>
+          </div>
         </div>
         <div id="testimonials-list" class="items-list"></div>
-        <div class="form-actions">
-          <button type="button" class="btn btn-primary save-section-btn" data-section="testimonials">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-            Save &amp; Commit
-          </button>
-          <button type="button" class="btn btn-ghost cancel-btn">Cancel</button>
-        </div>
       </section>
 
       <!-- ====== FAQ ====== -->
@@ -441,28 +482,37 @@
             <h2>FAQ</h2>
             <p class="page-desc">Frequently asked questions</p>
           </div>
-          <button class="btn btn-primary btn-sm" id="add-faq-btn">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Add FAQ
-          </button>
+          <div class="header-actions">
+            <button class="btn btn-outline btn-sm" id="add-faq-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add FAQ
+            </button>
+            <button class="btn btn-ghost btn-sm reset-section-btn" data-section="faq">Reset</button>
+            <button class="btn btn-primary btn-sm save-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Save Changes
+            </button>
+          </div>
         </div>
         <div id="faq-list" class="items-list"></div>
-        <div class="form-actions">
-          <button type="button" class="btn btn-primary save-section-btn" data-section="faq">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-            Save &amp; Commit
-          </button>
-          <button type="button" class="btn btn-ghost cancel-btn">Cancel</button>
-        </div>
       </section>
 
       <!-- ====== ABOUT ====== -->
       <section class="page" id="page-about" style="display:none;">
         <div class="page-header">
-          <h2>About</h2>
-          <p class="page-desc">About section and company values</p>
+          <div>
+            <h2>About</h2>
+            <p class="page-desc">About section and company values</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-ghost btn-sm reset-section-btn" data-section="about">Reset</button>
+            <button class="btn btn-primary btn-sm save-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Save Changes
+            </button>
+          </div>
         </div>
-        <form id="form-about" class="content-form">
+        <div class="content-form">
           <div class="form-grid">
             <div class="form-group full-width">
               <label for="about-headline">Headline</label>
@@ -473,44 +523,15 @@
               <textarea id="about-description" rows="4" data-field="about.description"></textarea>
             </div>
           </div>
-        </form>
+        </div>
         <div class="subsection-header">
           <h3>Company Values</h3>
-          <button class="btn btn-primary btn-sm" id="add-value-btn">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <button class="btn btn-outline btn-sm" id="add-value-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             Add Value
           </button>
         </div>
         <div id="values-list" class="items-list"></div>
-        <div class="form-actions">
-          <button type="button" class="btn btn-primary save-section-btn" data-section="about">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-            Save &amp; Commit
-          </button>
-          <button type="button" class="btn btn-ghost cancel-btn">Cancel</button>
-        </div>
-      </section>
-
-      <!-- ====== IMAGES ====== -->
-      <section class="page" id="page-images" style="display:none;">
-        <div class="page-header">
-          <div>
-            <h2>Image Manager</h2>
-            <p class="page-desc">Upload and manage website images</p>
-          </div>
-          <label class="btn btn-primary btn-sm upload-btn-label">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            Upload Image
-            <input type="file" id="image-upload-input" accept="image/*" style="display:none;">
-          </label>
-        </div>
-        <div id="upload-progress" class="upload-progress" style="display:none;">
-          <div class="upload-progress-bar">
-            <div class="upload-progress-fill" id="upload-progress-fill"></div>
-          </div>
-          <span id="upload-progress-text">Uploading...</span>
-        </div>
-        <div id="images-grid" class="images-grid"></div>
       </section>
 
     </main>
