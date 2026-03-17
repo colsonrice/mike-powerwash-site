@@ -441,6 +441,10 @@
     soft: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M8 12a4 4 0 018 0"/><line x1="12" y1="8" x2="12" y2="2"/></svg>',
     star: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>',
   };
+  // Aliases for content.json icon names
+  serviceIcons.road = serviceIcons.concrete;
+  serviceIcons.building = serviceIcons.commercial;
+  serviceIcons.droplet = serviceIcons.soft;
 
   function renderServicesFromData(services) {
     const grid = document.querySelector('.services-grid');

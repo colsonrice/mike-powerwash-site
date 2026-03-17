@@ -549,6 +549,7 @@ button { cursor: pointer; border: none; background: none; font: inherit; color: 
   flex-wrap: wrap;
   justify-content: center;
   gap: .625rem 1.25rem;
+  padding-bottom: 1rem;
 }
 .trust-item {
   display: flex;
@@ -562,11 +563,11 @@ button { cursor: pointer; border: none; background: none; font: inherit; color: 
 
 .hero-scroll-hint {
   position: absolute;
-  bottom: 2rem;
+  bottom: 1.5rem;
   left: 50%;
   transform: translateX(-50%);
   z-index: 2;
-  display: flex;
+  display: none;
   flex-direction: column;
   align-items: center;
   gap: .5rem;
@@ -593,7 +594,10 @@ button { cursor: pointer; border: none; background: none; font: inherit; color: 
   animation: scrollLine 2s ease-in-out infinite;
 }
 
-@media (max-height: 680px) { .hero-scroll-hint { display: none; } }
+/* Show scroll hint only on desktop-height viewports with room */
+@media (min-width: 768px) and (min-height: 700px) {
+  .hero-scroll-hint { display: flex; }
+}
 
 /* --- STATS --- */
 .stats {
@@ -738,11 +742,11 @@ button { cursor: pointer; border: none; background: none; font: inherit; color: 
 
 .gallery-grid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.5rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
 }
 @media (min-width: 768px) {
-  .gallery-grid { grid-template-columns: repeat(3, 1fr); }
+  .gallery-grid { grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
 }
 
 .gallery-card {
@@ -763,9 +767,12 @@ button { cursor: pointer; border: none; background: none; font: inherit; color: 
 }
 .gallery-img-wrap img {
   width: 100%;
-  aspect-ratio: 4/5;
+  aspect-ratio: 1;
   object-fit: cover;
   transition: transform .5s cubic-bezier(.22,1,.36,1);
+}
+@media (min-width: 768px) {
+  .gallery-img-wrap img { aspect-ratio: 4/5; }
 }
 .gallery-card:hover .gallery-img-wrap img { transform: scale(1.04); }
 
@@ -792,9 +799,12 @@ button { cursor: pointer; border: none; background: none; font: inherit; color: 
 .gallery-label-after { background: rgba(46,204,113,.9); color: var(--white); }
 
 .gallery-caption {
-  padding: 1rem 1.25rem;
-  font-size: .9375rem;
+  padding: .75rem .875rem;
+  font-size: .8125rem;
   color: var(--gray-700);
+}
+@media (min-width: 768px) {
+  .gallery-caption { padding: 1rem 1.25rem; font-size: .9375rem; }
 }
 .gallery-caption strong { color: var(--charcoal); }
 
@@ -1250,13 +1260,13 @@ a.contact-info-item:hover { opacity: .85; }
   flex-direction: column;
   align-items: center;
   gap: .25rem;
-  padding: 1.5rem 0;
+  padding: 1.5rem 0 5rem;
   text-align: center;
   font-size: .8125rem;
   color: rgba(255,255,255,.35);
 }
 @media (min-width: 768px) {
-  .footer-bottom { flex-direction: row; justify-content: space-between; }
+  .footer-bottom { flex-direction: row; justify-content: space-between; padding-bottom: 1.5rem; }
 }
 
 /* --- FLOATING CTA --- */
