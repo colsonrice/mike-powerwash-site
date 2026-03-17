@@ -670,7 +670,7 @@
     });
 
     if (resp.status === 401) {
-      clearToken();
+      clearSessionToken();
       showSetup();
       showToast('Token expired. Please reconnect.', 'error');
       return null;
