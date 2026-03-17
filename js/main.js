@@ -119,15 +119,62 @@
     if (statsSection) statsObserver.observe(statsSection);
   }
 
-  // ---- Testimonial carousel ----
+  // ---- Testimonial carousel (dynamic from content.json) ----
   const track = document.getElementById('testimonials-track');
-  const cards = track ? track.querySelectorAll('.testimonial-card') : [];
-  const dots = document.querySelectorAll('.carousel-dot');
+  const dotsContainer = document.getElementById('carousel-dots');
   const prevBtn = document.querySelector('.carousel-prev');
   const nextBtn = document.querySelector('.carousel-next');
+  let cards = [];
+  let dots = [];
   let currentSlide = 0;
   let autoplayTimer;
   let slidesVisible = 1;
+
+  const starSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
+
+  function escapeText(str) {
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  function renderTestimonials(testimonials) {
+    if (!track || !dotsContainer) return;
+
+    // Build cards
+    track.innerHTML = testimonials.map(t => {
+      const rating = t.rating || 5;
+      const starsHtml = Array.from({length: rating}, () => starSvg).join('');
+      return `<article class="testimonial-card" aria-label="Review from ${escapeText(t.name)}">
+        <div class="testimonial-stars" aria-label="${rating} out of 5 stars">${starsHtml}</div>
+        <blockquote class="testimonial-text">&ldquo;${escapeText(t.text)}&rdquo;</blockquote>
+        <footer class="testimonial-author">
+          <span class="testimonial-name">${escapeText(t.name)}</span>
+          <span class="testimonial-service">${escapeText(t.service)}</span>
+        </footer>
+      </article>`;
+    }).join('');
+
+    // Build dots
+    dotsContainer.innerHTML = testimonials.map((_, i) =>
+      `<button class="carousel-dot${i === 0 ? ' active' : ''}" role="tab" aria-selected="${i === 0}" aria-label="Slide ${i + 1}"></button>`
+    ).join('');
+
+    // Re-query elements
+    cards = track.querySelectorAll('.testimonial-card');
+    dots = dotsContainer.querySelectorAll('.carousel-dot');
+
+    // Init carousel
+    if (cards.length) {
+      currentSlide = 0;
+      updateSlidesVisible();
+      goToSlide(0);
+      dots.forEach((dot, i) => {
+        dot.addEventListener('click', () => { goToSlide(i); startAutoplay(); });
+      });
+      startAutoplay();
+    }
+  }
 
   function updateSlidesVisible() {
     if (window.innerWidth >= 1024) slidesVisible = 3;
@@ -136,10 +183,11 @@
   }
 
   function goToSlide(index) {
+    if (!cards.length) return;
     const maxSlide = Math.max(0, cards.length - slidesVisible);
     currentSlide = Math.max(0, Math.min(index, maxSlide));
 
-    const gap = 24; // 1.5rem
+    const gap = 24;
     const cardWidth = cards[0].offsetWidth + (slidesVisible > 1 ? gap : 0);
     track.style.transform = `translateX(-${currentSlide * cardWidth}px)`;
 
@@ -168,24 +216,16 @@
     clearInterval(autoplayTimer);
   }
 
-  if (track && cards.length) {
+  if (prevBtn) prevBtn.addEventListener('click', () => { prevSlide(); startAutoplay(); });
+  if (nextBtn) nextBtn.addEventListener('click', () => { nextSlide(); startAutoplay(); });
+
+  window.addEventListener('resize', () => {
     updateSlidesVisible();
-    goToSlide(0);
+    goToSlide(currentSlide);
+  });
 
-    if (prevBtn) prevBtn.addEventListener('click', () => { prevSlide(); startAutoplay(); });
-    if (nextBtn) nextBtn.addEventListener('click', () => { nextSlide(); startAutoplay(); });
-    dots.forEach((dot, i) => {
-      dot.addEventListener('click', () => { goToSlide(i); startAutoplay(); });
-    });
-
-    window.addEventListener('resize', () => {
-      updateSlidesVisible();
-      goToSlide(currentSlide);
-    });
-
-    startAutoplay();
-
-    // Pause on hover/focus
+  // Pause on hover/focus
+  if (track) {
     const carouselRegion = track.closest('.testimonials-carousel');
     if (carouselRegion) {
       carouselRegion.addEventListener('mouseenter', stopAutoplay);
@@ -194,6 +234,16 @@
       carouselRegion.addEventListener('focusout', startAutoplay);
     }
   }
+
+  // Fetch content.json and render testimonials
+  fetch('data/content.json')
+    .then(r => r.json())
+    .then(data => {
+      if (data.testimonials && data.testimonials.length) {
+        renderTestimonials(data.testimonials);
+      }
+    })
+    .catch(err => console.warn('Could not load testimonials:', err));
 
   // ---- FAQ accordion ----
   const faqItems = document.querySelectorAll('.faq-item');
