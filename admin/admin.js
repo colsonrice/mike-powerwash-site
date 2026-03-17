@@ -39,18 +39,28 @@
   const unsavedBar = $('#unsaved-bar');
 
   // ================================================
-  // GITHUB TOKEN MANAGEMENT
+  // ADMIN CONFIG PATH (encrypted token stored in repo)
   // ================================================
+  const ADMIN_CONFIG_PATH = 'data/admin-config.json';
+  let adminConfigSha = null; // SHA for admin-config.json updates
+
+  // ================================================
+  // SESSION TOKEN (decrypted, in-memory only)
+  // ================================================
+  let sessionToken = null;
+
   function getToken() {
-    return localStorage.getItem('sudsaway_gh_token');
+    return sessionToken || sessionStorage.getItem('sudsaway_session_token');
   }
 
-  function setToken(token) {
-    localStorage.setItem('sudsaway_gh_token', token);
+  function setSessionToken(token) {
+    sessionToken = token;
+    sessionStorage.setItem('sudsaway_session_token', token);
   }
 
-  function clearToken() {
-    localStorage.removeItem('sudsaway_gh_token');
+  function clearSessionToken() {
+    sessionToken = null;
+    sessionStorage.removeItem('sudsaway_session_token');
   }
 
   function isConnected() {
@@ -63,6 +73,120 @@
       Accept: 'application/vnd.github.v3+json',
       'Content-Type': 'application/json',
     };
+  }
+
+  // ================================================
+  // WEB CRYPTO: ENCRYPT / DECRYPT TOKEN
+  // ================================================
+
+  /** Derive an AES-GCM key from a password + salt */
+  async function deriveKey(password, salt) {
+    var enc = new TextEncoder();
+    var keyMaterial = await crypto.subtle.importKey(
+      'raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']
+    );
+    return crypto.subtle.deriveKey(
+      { name: 'PBKDF2', salt: salt, iterations: 100000, hash: 'SHA-256' },
+      keyMaterial,
+      { name: 'AES-GCM', length: 256 },
+      false,
+      ['encrypt', 'decrypt']
+    );
+  }
+
+  /** Encrypt a string with a password → returns { salt, iv, ciphertext } as hex */
+  async function encryptToken(token, password) {
+    var enc = new TextEncoder();
+    var salt = crypto.getRandomValues(new Uint8Array(16));
+    var iv = crypto.getRandomValues(new Uint8Array(12));
+    var key = await deriveKey(password, salt);
+    var encrypted = await crypto.subtle.encrypt(
+      { name: 'AES-GCM', iv: iv },
+      key,
+      enc.encode(token)
+    );
+    return {
+      salt: bufToHex(salt),
+      iv: bufToHex(iv),
+      ciphertext: bufToHex(new Uint8Array(encrypted)),
+    };
+  }
+
+  /** Decrypt a token using { salt, iv, ciphertext } and a password */
+  async function decryptToken(encData, password) {
+    var salt = hexToBuf(encData.salt);
+    var iv = hexToBuf(encData.iv);
+    var ciphertext = hexToBuf(encData.ciphertext);
+    var key = await deriveKey(password, salt);
+    var decrypted = await crypto.subtle.decrypt(
+      { name: 'AES-GCM', iv: iv },
+      key,
+      ciphertext
+    );
+    return new TextDecoder().decode(decrypted);
+  }
+
+  /** Uint8Array → hex string */
+  function bufToHex(buf) {
+    return Array.from(buf).map(function (b) {
+      return b.toString(16).padStart(2, '0');
+    }).join('');
+  }
+
+  /** hex string → Uint8Array */
+  function hexToBuf(hex) {
+    var bytes = new Uint8Array(hex.length / 2);
+    for (var i = 0; i < hex.length; i += 2) {
+      bytes[i / 2] = parseInt(hex.substr(i, 2), 16);
+    }
+    return bytes;
+  }
+
+  /** Fetch admin-config.json from GitHub (public, no auth needed) */
+  async function fetchAdminConfig() {
+    try {
+      var url = 'https://raw.githubusercontent.com/' + REPO_OWNER + '/' + REPO_NAME + '/' + BRANCH + '/' + ADMIN_CONFIG_PATH + '?t=' + Date.now();
+      var resp = await fetch(url);
+      if (!resp.ok) return null;
+      return resp.json();
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /** Save admin-config.json to the repo (requires valid token) */
+  async function saveAdminConfig(config) {
+    // Get current SHA first
+    var checkUrl = API_BASE + '/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/' + ADMIN_CONFIG_PATH + '?ref=' + BRANCH;
+    var checkResp = await fetch(checkUrl, { headers: apiHeaders() });
+    var sha = null;
+    if (checkResp.ok) {
+      var existing = await checkResp.json();
+      sha = existing.sha;
+    }
+
+    var jsonStr = JSON.stringify(config, null, 2) + '\n';
+    var encoded = btoa(unescape(encodeURIComponent(jsonStr)));
+
+    var body = {
+      message: 'Update admin config',
+      content: encoded,
+      branch: BRANCH,
+    };
+    if (sha) body.sha = sha;
+
+    var url = API_BASE + '/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/' + ADMIN_CONFIG_PATH;
+    var resp = await fetch(url, {
+      method: 'PUT',
+      headers: apiHeaders(),
+      body: JSON.stringify(body),
+    });
+
+    if (!resp.ok) {
+      var errData = await resp.json().catch(function () { return {}; });
+      throw new Error(errData.message || 'Failed to save config');
+    }
+    return true;
   }
 
   // ================================================
@@ -191,6 +315,22 @@
     var app = $('#app-shell');
     if (setup) setup.style.display = '';
     if (app) app.style.display = 'none';
+    // Default to team login view
+    showLoginCard();
+  }
+
+  function showLoginCard() {
+    var login = $('#login-card');
+    var owner = $('#owner-setup-card');
+    if (login) login.style.display = '';
+    if (owner) owner.style.display = 'none';
+  }
+
+  function showOwnerCard() {
+    var login = $('#login-card');
+    var owner = $('#owner-setup-card');
+    if (login) login.style.display = 'none';
+    if (owner) owner.style.display = '';
   }
 
   function showApp() {
@@ -208,42 +348,138 @@
     if (text) text.textContent = isConnected() ? 'Connected' : 'Not connected';
   }
 
-  async function validateAndConnect(token) {
-    try {
-      var resp = await fetch(API_BASE + '/user', {
-        headers: { Authorization: 'Bearer ' + token, Accept: 'application/vnd.github.v3+json' },
-      });
-      if (!resp.ok) throw new Error('Invalid token');
-      var user = await resp.json();
-      setToken(token);
-      showApp();
-      loadContent();
-      showToast('Connected as ' + user.login, 'success');
-      return true;
-    } catch (err) {
-      showToast('Connection failed: ' + err.message, 'error');
-      return false;
-    }
+  /** Validate a GitHub token by checking /user endpoint */
+  async function validateGitHubToken(token) {
+    var resp = await fetch(API_BASE + '/user', {
+      headers: { Authorization: 'Bearer ' + token, Accept: 'application/vnd.github.v3+json' },
+    });
+    if (!resp.ok) throw new Error('Invalid token');
+    return resp.json();
   }
 
   function initSetup() {
-    var form = $('#setup-form');
-    if (!form) return;
+    // ---- Toggle between login and owner setup views ----
+    var showOwnerBtn = $('#show-owner-setup');
+    var showTeamBtn = $('#show-team-login');
+    if (showOwnerBtn) showOwnerBtn.addEventListener('click', showOwnerCard);
+    if (showTeamBtn) showTeamBtn.addEventListener('click', showLoginCard);
 
-    form.addEventListener('submit', async function (e) {
-      e.preventDefault();
-      var tokenInput = $('#setup-token');
-      var btn = $('#setup-connect-btn');
-      var token = tokenInput.value.trim();
-      if (!token) return;
+    // ---- TEAM LOGIN FORM ----
+    var loginForm = $('#login-form');
+    if (loginForm) {
+      loginForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        var passwordInput = $('#login-password');
+        var btn = $('#login-btn');
+        var errorEl = $('#login-error');
+        var password = passwordInput.value.trim();
+        if (!password) return;
 
-      btn.disabled = true;
-      btn.innerHTML = '<span class="spinner" style="width:18px;height:18px;border-width:2px;display:inline-block;margin-right:8px;vertical-align:middle"></span> Connecting...';
-      var ok = await validateAndConnect(token);
-      btn.disabled = false;
-      btn.textContent = 'Connect';
-      if (!ok) tokenInput.focus();
-    });
+        btn.disabled = true;
+        btn.textContent = 'Signing in...';
+        if (errorEl) errorEl.style.display = 'none';
+
+        try {
+          // Fetch the encrypted config from the repo
+          var config = await fetchAdminConfig();
+          if (!config || !config.encryptedToken) {
+            throw new Error('NO_CONFIG');
+          }
+
+          // Decrypt the token with the entered password
+          var token = await decryptToken(config.encryptedToken, password);
+
+          // Validate the token works with GitHub
+          var user = await validateGitHubToken(token);
+
+          // Success! Store in session and enter app
+          setSessionToken(token);
+          showApp();
+          loadContent();
+          showToast('Welcome back!', 'success');
+        } catch (err) {
+          if (err.message === 'NO_CONFIG') {
+            // No config exists yet — need owner setup
+            if (errorEl) {
+              errorEl.textContent = 'No team password has been set up yet. Click "Owner Setup" below to get started.';
+              errorEl.style.display = '';
+            }
+          } else {
+            if (errorEl) {
+              errorEl.textContent = 'Incorrect password. Please try again.';
+              errorEl.style.display = '';
+            }
+          }
+          passwordInput.focus();
+        }
+
+        btn.disabled = false;
+        btn.textContent = 'Sign In';
+      });
+    }
+
+    // ---- OWNER SETUP FORM ----
+    var ownerForm = $('#owner-setup-form');
+    if (ownerForm) {
+      ownerForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        var tokenInput = $('#setup-token');
+        var passwordInput = $('#setup-password');
+        var confirmInput = $('#setup-password-confirm');
+        var btn = $('#owner-setup-btn');
+
+        var token = tokenInput.value.trim();
+        var password = passwordInput.value;
+        var confirm = confirmInput.value;
+
+        if (!token || !password || !confirm) return;
+
+        if (password !== confirm) {
+          showToast('Passwords do not match', 'error');
+          confirmInput.focus();
+          return;
+        }
+
+        if (password.length < 4) {
+          showToast('Password must be at least 4 characters', 'error');
+          passwordInput.focus();
+          return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner" style="width:18px;height:18px;border-width:2px;display:inline-block;margin-right:8px;vertical-align:middle"></span> Setting up...';
+
+        try {
+          // Validate the GitHub token first
+          var user = await validateGitHubToken(token);
+
+          // Encrypt the token with the password
+          var encData = await encryptToken(token, password);
+
+          // Store token in session so we can save the config
+          setSessionToken(token);
+
+          // Save encrypted config to GitHub repo
+          await saveAdminConfig({
+            encryptedToken: encData,
+            createdBy: user.login,
+            createdAt: new Date().toISOString(),
+          });
+
+          // Enter the app
+          showApp();
+          loadContent();
+          showToast('Setup complete! Share the team password with your team.', 'success', 6000);
+        } catch (err) {
+          clearSessionToken();
+          showToast('Setup failed: ' + err.message, 'error');
+          tokenInput.focus();
+        }
+
+        btn.disabled = false;
+        btn.innerHTML = 'Save &amp; Connect';
+      });
+    }
 
     // Toggle token visibility
     var toggleBtn = $('#toggle-token-vis');
@@ -268,7 +504,7 @@
 
       if (resp.status === 401) {
         hideLoading();
-        clearToken();
+        clearSessionToken();
         showSetup();
         showToast('Token expired or invalid. Please reconnect.', 'error');
         return;
@@ -334,7 +570,7 @@
 
       if (resp.status === 401) {
         hideLoading();
-        clearToken();
+        clearSessionToken();
         showSetup();
         showToast('Token expired. Please reconnect.', 'error');
         return;
@@ -1405,14 +1641,14 @@
     var disconnectBtn = $('#settings-disconnect-btn');
     if (disconnectBtn) {
       disconnectBtn.addEventListener('click', function () {
-        if (!confirm('Disconnect from GitHub? You will need to re-enter your token.')) return;
-        clearToken();
+        if (!confirm('Log out? You will need to enter your password again.')) return;
+        clearSessionToken();
         contentData = null;
         originalData = null;
         contentSha = null;
         hasUnsavedChanges = false;
         showSetup();
-        showToast('Disconnected', 'info');
+        showToast('Logged out', 'info');
       });
     }
   }
@@ -1438,7 +1674,14 @@
     document.addEventListener('dragover', function (e) { e.preventDefault(); });
     document.addEventListener('drop', function (e) { e.preventDefault(); });
 
-    // Check if already connected
+    // Migration: if old localStorage token exists, use it for this session
+    var legacyToken = localStorage.getItem('sudsaway_gh_token');
+    if (legacyToken && !isConnected()) {
+      setSessionToken(legacyToken);
+      localStorage.removeItem('sudsaway_gh_token');
+    }
+
+    // Check if already connected (session token exists)
     if (isConnected()) {
       showApp();
       loadContent();

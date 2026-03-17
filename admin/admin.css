@@ -215,6 +215,12 @@ img {
   color: var(--gray-400);
   margin-top: 0.75rem;
 }
+.setup-admin-link {
+  text-align: center;
+  border-top: 1px solid var(--gray-100);
+  padding-top: 0.75rem;
+  margin-top: 0.5rem;
+}
 
 /* ================================================
    APP SHELL LAYOUT

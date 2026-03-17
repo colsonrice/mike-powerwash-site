@@ -12,59 +12,90 @@
 <body>
 
   <!-- ============================================ -->
-  <!-- SETUP SCREEN (one-time)                       -->
+  <!-- LOGIN SCREEN (simple team password)           -->
   <!-- ============================================ -->
   <div id="setup-screen" class="setup-screen" style="display:none;">
-    <div class="setup-card">
+
+    <!-- TEAM LOGIN (default view) -->
+    <div class="setup-card" id="login-card">
       <div class="setup-header">
         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ff6b35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 2L2 7l10 5 10-5-10-5z"/>
           <path d="M2 17l10 5 10-5"/>
           <path d="M2 12l10 5 10-5"/>
         </svg>
-        <h1>Welcome to Your Website Manager</h1>
-        <p class="setup-subtitle">Let's connect your admin panel to your website. This only takes a minute and you'll never need to do it again.</p>
+        <h1>Website Manager</h1>
+        <p class="setup-subtitle">Enter your team password to manage your website content.</p>
       </div>
 
-      <div class="setup-steps">
-        <div class="setup-step">
-          <span class="step-num">1</span>
-          <div>
-            <strong>Create a GitHub token</strong>
-            <p><a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">Click here to create one</a>. Name it <code>SudsAway CRM</code>, set expiration to <strong>No expiration</strong>.</p>
-          </div>
+      <form id="login-form" autocomplete="off">
+        <div class="form-group" style="margin-bottom:1.25rem;">
+          <label for="login-password" style="color:var(--gray-600);font-size:0.85rem;">Team Password</label>
+          <input type="password" id="login-password" placeholder="Enter your password" required style="padding:0.75rem 1rem;font-size:1rem;">
         </div>
-        <div class="setup-step">
-          <span class="step-num">2</span>
-          <div>
-            <strong>Select your repository</strong>
-            <p>Under "Repository access", select <strong>Only select repositories</strong>, then choose <code>mike-powerwash-site</code>.</p>
-          </div>
-        </div>
-        <div class="setup-step">
-          <span class="step-num">3</span>
-          <div>
-            <strong>Set permissions</strong>
-            <p>Under "Permissions" &rarr; "Repository permissions", set <strong>Contents</strong> to <strong>Read and write</strong>. Click <strong>Generate token</strong>.</p>
-          </div>
-        </div>
-        <div class="setup-step">
-          <span class="step-num">4</span>
-          <div>
-            <strong>Paste your token below</strong>
-            <p>Copy the token and paste it here. It will be saved in your browser.</p>
-          </div>
-        </div>
-      </div>
-
-      <form id="setup-form" autocomplete="off">
-        <div class="setup-input-row">
-          <input type="password" id="setup-token" placeholder="github_pat_xxxxxxxxxxxx" required>
-          <button type="button" id="toggle-token-vis" class="btn btn-ghost btn-sm">Show</button>
-        </div>
-        <button type="submit" id="setup-connect-btn" class="btn btn-primary btn-full">Connect</button>
-        <p class="setup-note">Your token is stored only in this browser and never shared.</p>
+        <button type="submit" id="login-btn" class="btn btn-primary btn-full">Sign In</button>
+        <p class="setup-note" id="login-error" style="color:var(--error);display:none;margin-top:0.75rem;font-size:0.82rem;"></p>
       </form>
+
+      <div class="setup-admin-link">
+        <button type="button" id="show-owner-setup" class="btn btn-ghost btn-sm" style="margin-top:1.25rem;font-size:0.78rem;color:var(--gray-400);">Owner Setup</button>
+      </div>
+    </div>
+
+    <!-- OWNER SETUP (hidden by default) -->
+    <div class="setup-card" id="owner-setup-card" style="display:none;">
+      <div class="setup-header">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ff6b35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06A1.65 1.65 0 0 0 15 19.4V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9V9c.26.46.72.78 1.24.86H21a2 2 0 0 1 0 4h-.09"/>
+        </svg>
+        <h1>Owner Setup</h1>
+        <p class="setup-subtitle">Connect your GitHub token and create a team password. You only need to do this once &mdash; your team can then log in with just the password.</p>
+      </div>
+
+      <form id="owner-setup-form" autocomplete="off">
+        <div class="setup-steps" style="margin-bottom:1.5rem;">
+          <div class="setup-step">
+            <span class="step-num">1</span>
+            <div>
+              <strong>Create a GitHub token</strong>
+              <p><a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">Click here to create one</a>. Name it <code>SudsAway CRM</code>, set expiration to <strong>No expiration</strong>.</p>
+            </div>
+          </div>
+          <div class="setup-step">
+            <span class="step-num">2</span>
+            <div>
+              <strong>Set repository &amp; permissions</strong>
+              <p>Select <strong>Only select repositories</strong> &rarr; <code>mike-powerwash-site</code>. Set <strong>Contents</strong> to <strong>Read and write</strong>.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom:1rem;">
+          <label for="setup-token" style="color:var(--gray-600);font-size:0.85rem;">GitHub Token</label>
+          <div class="setup-input-row">
+            <input type="password" id="setup-token" placeholder="github_pat_xxxxxxxxxxxx" required>
+            <button type="button" id="toggle-token-vis" class="btn btn-ghost btn-sm">Show</button>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom:1rem;">
+          <label for="setup-password" style="color:var(--gray-600);font-size:0.85rem;">Create Team Password</label>
+          <input type="password" id="setup-password" placeholder="Choose a simple password for your team" required style="width:100%;padding:0.7rem 1rem;border:1px solid var(--gray-300);border-radius:var(--radius);font-family:var(--font-body);font-size:0.9rem;">
+        </div>
+
+        <div class="form-group" style="margin-bottom:1.25rem;">
+          <label for="setup-password-confirm" style="color:var(--gray-600);font-size:0.85rem;">Confirm Password</label>
+          <input type="password" id="setup-password-confirm" placeholder="Re-enter the password" required style="width:100%;padding:0.7rem 1rem;border:1px solid var(--gray-300);border-radius:var(--radius);font-family:var(--font-body);font-size:0.9rem;">
+        </div>
+
+        <button type="submit" id="owner-setup-btn" class="btn btn-primary btn-full">Save &amp; Connect</button>
+        <p class="setup-note">Your token is encrypted with your password and stored securely.</p>
+      </form>
+
+      <div class="setup-admin-link">
+        <button type="button" id="show-team-login" class="btn btn-ghost btn-sm" style="margin-top:1.25rem;font-size:0.78rem;color:var(--gray-400);">&larr; Back to Team Login</button>
+      </div>
     </div>
   </div>
 
@@ -154,7 +185,7 @@
           <span id="settings-status-dot" style="width:8px;height:8px;border-radius:50%;background:var(--success);flex-shrink:0;"></span>
           <span id="settings-status-text">Connected</span>
         </div>
-        <button id="settings-disconnect-btn" class="btn btn-ghost btn-sm" style="margin-top:0.5rem;font-size:0.72rem;padding:0.3rem 0.6rem;color:rgba(255,255,255,0.4);">Disconnect</button>
+        <button id="settings-disconnect-btn" class="btn btn-ghost btn-sm" style="margin-top:0.5rem;font-size:0.72rem;padding:0.3rem 0.6rem;color:rgba(255,255,255,0.4);">Log Out</button>
       </div>
     </aside>
 
