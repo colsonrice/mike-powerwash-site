@@ -311,6 +311,10 @@
       // --- Hero section ---
       if (data.hero) {
         const h = data.hero;
+        if (h.heroImage) {
+          const heroImg = document.getElementById('hero-bg-img');
+          if (heroImg) heroImg.src = h.heroImage;
+        }
         if (h.headline) {
           const headlineEl = document.querySelector('.hero-headline');
           if (headlineEl) {

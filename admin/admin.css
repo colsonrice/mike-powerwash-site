@@ -1144,6 +1144,17 @@ img {
   border-radius: var(--radius);
 }
 
+/* Hint text */
+.drop-zone-hint {
+  font-size: 0.78rem;
+  color: var(--gray-400);
+  margin: 0.15rem 0 0;
+  line-height: 1.4;
+}
+.drop-zone-hint strong {
+  color: var(--gray-500);
+}
+
 /* Uploading state */
 .drop-zone-uploading {
   display: flex;

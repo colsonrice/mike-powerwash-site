@@ -541,10 +541,14 @@
       var result = await uploadImageToGitHub(file, targetPath);
 
       if (result) {
-        // Update contentData
-        var arr = contentData[section];
-        if (arr && arr[index]) {
-          arr[index][fieldKey] = result;
+        // Update contentData — handle object sections (hero) vs array sections
+        if (section === 'hero') {
+          contentData.hero[fieldKey] = result;
+        } else {
+          var arr = contentData[section];
+          if (arr && arr[index]) {
+            arr[index][fieldKey] = result;
+          }
         }
         markDirty();
         showToast('Image uploaded! Remember to save.', 'success');
@@ -791,6 +795,18 @@
     $('#hero-cta').value = h.cta || '';
     $('#hero-ctaphone').value = h.ctaPhone || '';
     renderTrustBadges();
+
+    // Hero background image drop zone
+    var zoneContainer = $('#hero-image-zone');
+    if (zoneContainer) {
+      zoneContainer.innerHTML =
+        '<div class="form-group full-width">' +
+          '<label>Hero Background Image</label>' +
+          '<p class="drop-zone-hint">Recommended: <strong>1920 &times; 1080 px</strong> (landscape). JPG or PNG, under 5 MB.</p>' +
+        '</div>' +
+        dropZoneHtml(h.heroImage || '', 'hero', 0, 'heroImage');
+      bindDropZones(zoneContainer);
+    }
   }
 
   function renderTrustBadges() {
