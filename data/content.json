@@ -1,0 +1,156 @@
+{
+  "business": {
+    "name": "Suds Away Pro Wash",
+    "tagline": "Where Cleanliness Shines",
+    "phone": "(555) 123-4567",
+    "email": "info@sudsawayprowash.com",
+    "address": "Serving the Greater Metro Area",
+    "hours": "Mon-Sat: 7AM - 7PM | Sun: By Appointment",
+    "yearEstablished": 2020,
+    "license": "Licensed & Fully Insured"
+  },
+  "hero": {
+    "headline": "Your Property Deserves to Shine",
+    "subheadline": "Professional power washing & soft washing services that restore your home's beauty and protect your investment.",
+    "cta": "Get Your Free Quote",
+    "ctaPhone": "Or Call Now:",
+    "trustBadges": [
+      "Licensed & Insured",
+      "100% Satisfaction Guaranteed",
+      "Free Estimates",
+      "Eco-Friendly Solutions"
+    ]
+  },
+  "stats": [
+    { "number": 500, "suffix": "+", "label": "Properties Cleaned" },
+    { "number": 5, "suffix": "-Star", "label": "Average Rating" },
+    { "number": 100, "suffix": "%", "label": "Satisfaction Rate" },
+    { "number": 6, "suffix": "+", "label": "Years Experience" }
+  ],
+  "services": [
+    {
+      "id": "house-washing",
+      "title": "House Washing",
+      "description": "Restore your home's curb appeal with our safe, effective soft washing system. We gently remove years of dirt, algae, mildew, and grime from siding, brick, stucco, and more — without damaging your surfaces.",
+      "icon": "home",
+      "image": "images/work-1.png"
+    },
+    {
+      "id": "roof-cleaning",
+      "title": "Roof Cleaning",
+      "description": "Black streaks and moss don't just look bad — they shorten your roof's lifespan. Our soft wash roof cleaning safely eliminates algae and stains, extending your roof's life by years.",
+      "icon": "roof",
+      "image": "images/work-2.jpg"
+    },
+    {
+      "id": "driveway-concrete",
+      "title": "Driveway & Concrete",
+      "description": "Oil stains, tire marks, and years of buildup disappear under our professional-grade surface cleaning equipment. Driveways, sidewalks, patios, and pool decks restored to like-new condition.",
+      "icon": "road",
+      "image": "images/logo-1.png"
+    },
+    {
+      "id": "deck-fence",
+      "title": "Deck & Fence Restoration",
+      "description": "Bring your outdoor living spaces back to life. We clean and restore wood, composite, and vinyl decks and fences, prepping them perfectly for staining or sealing.",
+      "icon": "fence",
+      "image": "images/logo-2.png"
+    },
+    {
+      "id": "commercial",
+      "title": "Commercial Washing",
+      "description": "First impressions matter. Keep your storefront, parking lot, drive-through, and building exterior spotless with scheduled commercial power washing services.",
+      "icon": "building",
+      "image": "images/logo-2.png"
+    },
+    {
+      "id": "soft-washing",
+      "title": "Soft Washing",
+      "description": "For delicate surfaces that can't handle high pressure. Our soft wash system uses eco-friendly, biodegradable solutions at low pressure to safely clean roofs, siding, and painted surfaces.",
+      "icon": "droplet",
+      "image": "images/work-1.png"
+    }
+  ],
+  "gallery": [
+    {
+      "before": "images/work-1.png",
+      "after": "images/work-1.png",
+      "caption": "House Siding — Soft Wash",
+      "category": "house-washing"
+    },
+    {
+      "before": "images/work-2.jpg",
+      "after": "images/work-2.jpg",
+      "caption": "Roof Cleaning — Soft Wash",
+      "category": "roof-cleaning"
+    }
+  ],
+  "testimonials": [
+    {
+      "name": "Sarah M.",
+      "rating": 5,
+      "text": "Suds Away completely transformed the look of our home! The siding went from dingy and green to bright white. Couldn't be happier with the results.",
+      "service": "House Washing"
+    },
+    {
+      "name": "James R.",
+      "rating": 5,
+      "text": "I was amazed at the difference in my roof — those ugly black streaks are completely gone. Professional, on time, and the price was very fair.",
+      "service": "Roof Cleaning"
+    },
+    {
+      "name": "Linda K.",
+      "rating": 5,
+      "text": "Our driveway hadn't been cleaned in over 10 years. It looks brand new! Mike was incredibly professional and thorough. Highly recommend!",
+      "service": "Driveway Cleaning"
+    }
+  ],
+  "faq": [
+    {
+      "question": "What's the difference between pressure washing and soft washing?",
+      "answer": "Pressure washing uses high-pressure water (1,300-3,100 PSI) for tough surfaces like concrete and driveways. Soft washing uses low pressure (under 500 PSI) with eco-friendly cleaning solutions, making it safe for delicate surfaces like roofs, siding, and painted wood."
+    },
+    {
+      "question": "Is soft washing safe for my roof?",
+      "answer": "Absolutely. Soft washing is the method recommended by shingle manufacturers like GAF and CertainTeed. High-pressure washing can damage shingles and void your warranty. Our soft wash method cleans effectively without any risk to your roof."
+    },
+    {
+      "question": "How often should I have my house washed?",
+      "answer": "We recommend exterior house washing every 1-2 years depending on your environment. Homes in shaded or humid areas may benefit from annual cleaning to prevent algae and mildew buildup."
+    },
+    {
+      "question": "Are your cleaning solutions safe for plants and pets?",
+      "answer": "Yes! We use 100% biodegradable, eco-friendly cleaning solutions that are safe for your landscaping, pets, and family. We also take extra precautions to pre-rinse and protect plant beds during service."
+    },
+    {
+      "question": "Do you offer free estimates?",
+      "answer": "Yes, we provide completely free, no-obligation estimates. Call us or fill out our contact form and we'll get back to you quickly — usually within a few hours."
+    },
+    {
+      "question": "Are you licensed and insured?",
+      "answer": "Yes, Suds Away Pro Wash is fully licensed and insured, including general liability insurance. Your property is always protected when you work with us."
+    }
+  ],
+  "about": {
+    "headline": "Why Choose Suds Away Pro Wash?",
+    "description": "We're not just another pressure washing company. We combine professional-grade equipment with industry-leading soft wash techniques to deliver results that protect your property while making it look brand new. Every job is backed by our 100% satisfaction guarantee.",
+    "values": [
+      {
+        "title": "Professional-Grade Equipment",
+        "description": "Commercial-quality machines and custom-blended solutions for superior results on every job."
+      },
+      {
+        "title": "Eco-Friendly Approach",
+        "description": "100% biodegradable cleaning solutions that are safe for your family, pets, and landscaping."
+      },
+      {
+        "title": "Satisfaction Guaranteed",
+        "description": "We're not done until you're thrilled with the results. Every job backed by our 100% guarantee."
+      },
+      {
+        "title": "Licensed & Insured",
+        "description": "Full liability coverage for your peace of mind. Your property is always protected with us."
+      }
+    ]
+  }
+}

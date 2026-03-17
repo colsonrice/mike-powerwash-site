@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin CRM | Suds Away Pro Wash</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+  <!-- ============================================ -->
+  <!-- LOGIN SCREEN                                  -->
+  <!-- ============================================ -->
+  <div id="login-screen" class="login-screen">
+    <div class="login-card">
+      <div class="login-logo">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ff6b35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+          <path d="M2 17l10 5 10-5"/>
+          <path d="M2 12l10 5 10-5"/>
+        </svg>
+        <h1>Suds Away Pro Wash</h1>
+        <p class="login-subtitle">Content Management System</p>
+      </div>
+      <form id="login-form" autocomplete="off">
+        <div class="form-group">
+          <label for="gh-token">GitHub Personal Access Token</label>
+          <div class="token-input-wrap">
+            <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxx" required>
+            <button type="button" class="toggle-vis" id="toggle-token-vis" aria-label="Toggle visibility">
+              <svg class="eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <svg class="eye-off-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="repo-owner">Repo Owner</label>
+            <input type="text" id="repo-owner" placeholder="colsonrice" value="colsonrice">
+          </div>
+          <div class="form-group">
+            <label for="repo-name">Repo Name</label>
+            <input type="text" id="repo-name" placeholder="mike-powerwash-site" value="mike-powerwash-site">
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full" id="login-btn">
+          <span class="btn-text">Sign In</span>
+          <span class="btn-loader" style="display:none;">
+            <span class="spinner"></span> Authenticating...
+          </span>
+        </button>
+        <p class="login-help">
+          Need a token? <a href="https://github.com/settings/tokens/new" target="_blank" rel="noopener">Create one on GitHub</a> with <code>repo</code> scope.
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- MAIN APP SHELL                                -->
+  <!-- ============================================ -->
+  <div id="app-shell" class="app-shell" style="display:none;">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff6b35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+            <path d="M2 17l10 5 10-5"/>
+            <path d="M2 12l10 5 10-5"/>
+          </svg>
+          <div>
+            <span class="brand-name">CRM Panel</span>
+            <span class="brand-sub" id="sidebar-business-name">Suds Away Pro Wash</span>
+          </div>
+        </div>
+        <button class="sidebar-close" id="sidebar-close" aria-label="Close sidebar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <nav class="sidebar-nav">
+        <ul>
+          <li>
+            <a href="#" class="nav-link active" data-section="dashboard">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-link" data-section="business">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              <span>Business Info</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-link" data-section="hero">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              <span>Hero Section</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-link" data-section="stats">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+              <span>Stats</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-link" data-section="services">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <span>Services</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-link" data-section="gallery">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              <span>Gallery</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-link" data-section="testimonials">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <span>Testimonials</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-link" data-section="faq">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              <span>FAQ</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-link" data-section="about">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              <span>About</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-link" data-section="images">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2z"/><polyline points="16 3 16 9 12 7 8 9 8 3"/></svg>
+              <span>Images</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-repo" id="sidebar-repo-info">colsonrice/mike-powerwash-site</div>
+        <button class="btn btn-ghost btn-sm" id="logout-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Sign Out
+        </button>
+      </div>
+    </aside>
+
+    <!-- MOBILE HEADER -->
+    <header class="mobile-header" id="mobile-header">
+      <button class="hamburger" id="hamburger" aria-label="Open menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <span class="mobile-title" id="mobile-page-title">Dashboard</span>
+      <button class="btn btn-ghost btn-sm" id="mobile-logout-btn" aria-label="Sign out">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </header>
+
+    <!-- SIDEBAR OVERLAY (mobile) -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content" id="main-content">
+
+      <!-- LOADING OVERLAY -->
+      <div class="loading-overlay" id="loading-overlay" style="display:none;">
+        <div class="loading-spinner-wrap">
+          <div class="loading-spinner"></div>
+          <p id="loading-text">Loading content...</p>
+        </div>
+      </div>
+
+      <!-- ====== DASHBOARD ====== -->
+      <section class="page" id="page-dashboard">
+        <div class="page-header">
+          <h2>Dashboard</h2>
+          <p class="page-desc">Overview of your website content</p>
+        </div>
+
+        <div class="stats-grid" id="dashboard-stats">
+          <div class="stat-card" data-link="services">
+            <div class="stat-icon" style="background:#eef2ff;color:#1e88e5;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06A1.65 1.65 0 0 0 15 19.4a1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            </div>
+            <div class="stat-content">
+              <span class="stat-number" id="dash-services-count">0</span>
+              <span class="stat-label">Services</span>
+            </div>
+          </div>
+          <div class="stat-card" data-link="testimonials">
+            <div class="stat-icon" style="background:#fff4ed;color:#ff6b35;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div class="stat-content">
+              <span class="stat-number" id="dash-testimonials-count">0</span>
+              <span class="stat-label">Testimonials</span>
+            </div>
+          </div>
+          <div class="stat-card" data-link="gallery">
+            <div class="stat-icon" style="background:#f0fdf4;color:#16a34a;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            </div>
+            <div class="stat-content">
+              <span class="stat-number" id="dash-gallery-count">0</span>
+              <span class="stat-label">Gallery Items</span>
+            </div>
+          </div>
+          <div class="stat-card" data-link="faq">
+            <div class="stat-icon" style="background:#fef3f2;color:#dc2626;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <div class="stat-content">
+              <span class="stat-number" id="dash-faq-count">0</span>
+              <span class="stat-label">FAQ Items</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-info">
+          <div class="info-card">
+            <h3>Business Details</h3>
+            <div class="info-row"><span class="info-label">Business Name</span><span class="info-value" id="dash-biz-name">--</span></div>
+            <div class="info-row"><span class="info-label">Phone</span><span class="info-value" id="dash-biz-phone">--</span></div>
+            <div class="info-row"><span class="info-label">Email</span><span class="info-value" id="dash-biz-email">--</span></div>
+            <div class="info-row"><span class="info-label">Established</span><span class="info-value" id="dash-biz-year">--</span></div>
+          </div>
+          <div class="info-card">
+            <h3>Quick Actions</h3>
+            <div class="quick-actions">
+              <button class="btn btn-outline btn-sm" data-nav="business">Edit Business Info</button>
+              <button class="btn btn-outline btn-sm" data-nav="hero">Edit Hero Section</button>
+              <button class="btn btn-outline btn-sm" data-nav="services">Manage Services</button>
+              <button class="btn btn-outline btn-sm" data-nav="images">Upload Images</button>
+            </div>
+            <div class="info-row" style="margin-top:1rem;">
+              <span class="info-label">Last Fetched</span>
+              <span class="info-value" id="dash-last-updated">--</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====== BUSINESS INFO ====== -->
+      <section class="page" id="page-business" style="display:none;">
+        <div class="page-header">
+          <h2>Business Information</h2>
+          <p class="page-desc">Core details about your business</p>
+        </div>
+        <form id="form-business" class="content-form">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="biz-name">Business Name</label>
+              <input type="text" id="biz-name" data-field="business.name">
+            </div>
+            <div class="form-group">
+              <label for="biz-tagline">Tagline</label>
+              <input type="text" id="biz-tagline" data-field="business.tagline">
+            </div>
+            <div class="form-group">
+              <label for="biz-phone">Phone</label>
+              <input type="tel" id="biz-phone" data-field="business.phone">
+            </div>
+            <div class="form-group">
+              <label for="biz-email">Email</label>
+              <input type="email" id="biz-email" data-field="business.email">
+            </div>
+            <div class="form-group full-width">
+              <label for="biz-address">Address / Service Area</label>
+              <input type="text" id="biz-address" data-field="business.address">
+            </div>
+            <div class="form-group">
+              <label for="biz-hours">Hours</label>
+              <input type="text" id="biz-hours" data-field="business.hours">
+            </div>
+            <div class="form-group">
+              <label for="biz-year">Year Established</label>
+              <input type="number" id="biz-year" data-field="business.yearEstablished">
+            </div>
+            <div class="form-group full-width">
+              <label for="biz-license">License Info</label>
+              <input type="text" id="biz-license" data-field="business.license">
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              Save &amp; Commit
+            </button>
+            <button type="button" class="btn btn-ghost cancel-btn">Cancel</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- ====== HERO SECTION ====== -->
+      <section class="page" id="page-hero" style="display:none;">
+        <div class="page-header">
+          <h2>Hero Section</h2>
+          <p class="page-desc">Main banner content on the homepage</p>
+        </div>
+        <form id="form-hero" class="content-form">
+          <div class="form-grid">
+            <div class="form-group full-width">
+              <label for="hero-headline">Headline</label>
+              <input type="text" id="hero-headline" data-field="hero.headline">
+            </div>
+            <div class="form-group full-width">
+              <label for="hero-subheadline">Subheadline</label>
+              <textarea id="hero-subheadline" rows="3" data-field="hero.subheadline"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="hero-cta">CTA Button Text</label>
+              <input type="text" id="hero-cta" data-field="hero.cta">
+            </div>
+            <div class="form-group">
+              <label for="hero-ctaphone">CTA Phone Label</label>
+              <input type="text" id="hero-ctaphone" data-field="hero.ctaPhone">
+            </div>
+          </div>
+          <div class="form-group full-width">
+            <label>Trust Badges</label>
+            <div id="hero-badges-list" class="tag-list"></div>
+            <div class="inline-add">
+              <input type="text" id="hero-badge-input" placeholder="Add a trust badge...">
+              <button type="button" class="btn btn-outline btn-sm" id="hero-add-badge">Add</button>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              Save &amp; Commit
+            </button>
+            <button type="button" class="btn btn-ghost cancel-btn">Cancel</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- ====== STATS ====== -->
+      <section class="page" id="page-stats" style="display:none;">
+        <div class="page-header">
+          <div>
+            <h2>Stats</h2>
+            <p class="page-desc">Key numbers displayed on the homepage</p>
+          </div>
+          <button class="btn btn-primary btn-sm" id="add-stat-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Stat
+          </button>
+        </div>
+        <div id="stats-list" class="items-list"></div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-primary save-section-btn" data-section="stats">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            Save &amp; Commit
+          </button>
+          <button type="button" class="btn btn-ghost cancel-btn">Cancel</button>
+        </div>
+      </section>
+
+      <!-- ====== SERVICES ====== -->
+      <section class="page" id="page-services" style="display:none;">
+        <div class="page-header">
+          <div>
+            <h2>Services</h2>
+            <p class="page-desc">Your power washing services</p>
+          </div>
+          <button class="btn btn-primary btn-sm" id="add-service-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Service
+          </button>
+        </div>
+        <div id="services-list" class="items-list"></div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-primary save-section-btn" data-section="services">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            Save &amp; Commit
+          </button>
+          <button type="button" class="btn btn-ghost cancel-btn">Cancel</button>
+        </div>
+      </section>
+
+      <!-- ====== GALLERY ====== -->
+      <section class="page" id="page-gallery" style="display:none;">
+        <div class="page-header">
+          <div>
+            <h2>Gallery</h2>
+            <p class="page-desc">Before/after project photos</p>
+          </div>
+          <button class="btn btn-primary btn-sm" id="add-gallery-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Gallery Item
+          </button>
+        </div>
+        <div id="gallery-list" class="items-list"></div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-primary save-section-btn" data-section="gallery">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            Save &amp; Commit
+          </button>
+          <button type="button" class="btn btn-ghost cancel-btn">Cancel</button>
+        </div>
+      </section>
+
+      <!-- ====== TESTIMONIALS ====== -->
+      <section class="page" id="page-testimonials" style="display:none;">
+        <div class="page-header">
+          <div>
+            <h2>Testimonials</h2>
+            <p class="page-desc">Customer reviews and feedback</p>
+          </div>
+          <button class="btn btn-primary btn-sm" id="add-testimonial-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Testimonial
+          </button>
+        </div>
+        <div id="testimonials-list" class="items-list"></div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-primary save-section-btn" data-section="testimonials">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            Save &amp; Commit
+          </button>
+          <button type="button" class="btn btn-ghost cancel-btn">Cancel</button>
+        </div>
+      </section>
+
+      <!-- ====== FAQ ====== -->
+      <section class="page" id="page-faq" style="display:none;">
+        <div class="page-header">
+          <div>
+            <h2>FAQ</h2>
+            <p class="page-desc">Frequently asked questions</p>
+          </div>
+          <button class="btn btn-primary btn-sm" id="add-faq-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add FAQ
+          </button>
+        </div>
+        <div id="faq-list" class="items-list"></div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-primary save-section-btn" data-section="faq">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            Save &amp; Commit
+          </button>
+          <button type="button" class="btn btn-ghost cancel-btn">Cancel</button>
+        </div>
+      </section>
+
+      <!-- ====== ABOUT ====== -->
+      <section class="page" id="page-about" style="display:none;">
+        <div class="page-header">
+          <h2>About</h2>
+          <p class="page-desc">About section and company values</p>
+        </div>
+        <form id="form-about" class="content-form">
+          <div class="form-grid">
+            <div class="form-group full-width">
+              <label for="about-headline">Headline</label>
+              <input type="text" id="about-headline" data-field="about.headline">
+            </div>
+            <div class="form-group full-width">
+              <label for="about-description">Description</label>
+              <textarea id="about-description" rows="4" data-field="about.description"></textarea>
+            </div>
+          </div>
+        </form>
+        <div class="subsection-header">
+          <h3>Company Values</h3>
+          <button class="btn btn-primary btn-sm" id="add-value-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Value
+          </button>
+        </div>
+        <div id="values-list" class="items-list"></div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-primary save-section-btn" data-section="about">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            Save &amp; Commit
+          </button>
+          <button type="button" class="btn btn-ghost cancel-btn">Cancel</button>
+        </div>
+      </section>
+
+      <!-- ====== IMAGES ====== -->
+      <section class="page" id="page-images" style="display:none;">
+        <div class="page-header">
+          <div>
+            <h2>Image Manager</h2>
+            <p class="page-desc">Upload and manage website images</p>
+          </div>
+          <label class="btn btn-primary btn-sm upload-btn-label">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Upload Image
+            <input type="file" id="image-upload-input" accept="image/*" style="display:none;">
+          </label>
+        </div>
+        <div id="upload-progress" class="upload-progress" style="display:none;">
+          <div class="upload-progress-bar">
+            <div class="upload-progress-fill" id="upload-progress-fill"></div>
+          </div>
+          <span id="upload-progress-text">Uploading...</span>
+        </div>
+        <div id="images-grid" class="images-grid"></div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <script src="admin.js"></script>
+</body>
+</html>
