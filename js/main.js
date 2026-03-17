@@ -43,26 +43,67 @@
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
 
-  // ---- Mobile navigation ----
+  // ---- Mobile navigation (slide-in drawer) ----
   const hamburger = document.getElementById('hamburger');
   const mainNav = document.getElementById('main-nav');
+  const navBackdrop = document.getElementById('nav-backdrop');
+
+  // Reference to header-inner for moving nav back after close
+  const headerInner = document.querySelector('.header-inner');
+  const headerCta = document.querySelector('.header-cta');
+
+  function openMobileNav() {
+    // Move nav & backdrop to <body> so position:fixed escapes the header's
+    // backdrop-filter containing block (which would limit height to 72px).
+    document.body.appendChild(navBackdrop);
+    document.body.appendChild(mainNav);
+
+    mainNav.classList.add('open');
+    hamburger.classList.add('active');
+    hamburger.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';
+    navBackdrop.style.display = 'block';
+    requestAnimationFrame(() => navBackdrop.classList.add('visible'));
+  }
+
+  function closeMobileNav() {
+    mainNav.classList.remove('open');
+    hamburger.classList.remove('active');
+    hamburger.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+    navBackdrop.classList.remove('visible');
+    setTimeout(() => {
+      navBackdrop.style.display = 'none';
+      // Move nav & backdrop back inside header for correct desktop flex layout
+      if (headerInner && headerCta) {
+        headerInner.insertBefore(navBackdrop, headerCta);
+        headerInner.insertBefore(mainNav, headerCta);
+      }
+    }, 300);
+  }
+
+  // Close mobile nav if viewport grows past mobile breakpoint
+  window.addEventListener('resize', () => {
+    if (window.innerWidth >= 1024 && mainNav.classList.contains('open')) {
+      closeMobileNav();
+    }
+  });
 
   hamburger.addEventListener('click', () => {
-    const isOpen = mainNav.classList.toggle('open');
-    hamburger.classList.toggle('active');
-    hamburger.setAttribute('aria-expanded', isOpen);
-    document.body.style.overflow = isOpen ? 'hidden' : '';
+    if (mainNav.classList.contains('open')) closeMobileNav();
+    else openMobileNav();
   });
+
+  // Close on backdrop tap
+  if (navBackdrop) navBackdrop.addEventListener('click', closeMobileNav);
 
   // Close mobile nav on link click
   mainNav.querySelectorAll('.nav-link').forEach((link) => {
-    link.addEventListener('click', () => {
-      mainNav.classList.remove('open');
-      hamburger.classList.remove('active');
-      hamburger.setAttribute('aria-expanded', 'false');
-      document.body.style.overflow = '';
-    });
+    link.addEventListener('click', closeMobileNav);
   });
+  // Also close on CTA click
+  const mobileNavCta = mainNav.querySelector('.mobile-nav-cta');
+  if (mobileNavCta) mobileNavCta.addEventListener('click', closeMobileNav);
 
   // ---- Smooth scroll for anchor links ----
   document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
