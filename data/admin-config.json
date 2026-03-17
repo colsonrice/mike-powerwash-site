@@ -1,0 +1,9 @@
+{
+  "encryptedToken": {
+    "salt": "e0e2d94e161f54c6b898cef3dc975f2d",
+    "iv": "f52970fe7951d3f1717184e3",
+    "ciphertext": "f2b990ae134a3fe96691c6aba4306dc7b357ecf352079f5a8ba1badfbee8e9362e6139545a40caccc43fa69c8a70835dcb3cb83159c463c532f12b77b6f924b97addc6c02bfe09fb13251887b1a0cd5446b69b862c1890b79b4cd17bb4eda4b3383640de6b9c277f3e8395344b"
+  },
+  "createdBy": "colsonrice",
+  "createdAt": "2026-03-17T17:44:04.912Z"
+}
