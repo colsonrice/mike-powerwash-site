@@ -148,6 +148,11 @@ def normalise(raw, root):
                 continue
         warnings.append(f"{where}: skipped, no usable photo")
 
+    afters = {g.after.path: g.after.alt for g in gallery if g.kind == "pair"}
+    for s in services:
+        if s.image and s.image.path in afters:
+            s.image.alt = afters[s.image.path]
+
     testimonials = []
     for t in _visible(raw.get("testimonials")):
         who, text = _s(t.get("name")), _s(t.get("text"))
