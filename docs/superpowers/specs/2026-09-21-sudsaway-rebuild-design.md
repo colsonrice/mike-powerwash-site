@@ -71,15 +71,17 @@ All new fields are optional. The admin preserves them but can't edit them yet.
 A failed deploy is silent on Mike's side, because the admin still says "Changes saved!". So nothing
 the admin can save may fail the build or QA; QA failures are reserved for real code bugs.
 - Every visible `services[]` entry gets a page. Ids are slugified and de-duplicated
-  (`new-service`, `new-service-2`). An empty description falls back to a sentence built from
-  the title, and an unknown icon falls back to a default.
+  (`new-service`, `new-service-2`); a blank id falls back to the slugified title, then to
+  `service`. An empty description falls back to a sentence built from the title, and an unknown
+  icon falls back to a default.
 - Empty or missing images (for example the admin's default `images/placeholder.png`) are skipped
   with a warning, and the page renders without them.
 - Unknown gallery categories count as `general`.
 - Alt text is never empty for a content image: a blank caption falls back to a description
   built from the category, such as "House washing before and after".
 - Half-finished entries are skipped: testimonials with no text or name, FAQs with no question or
-  answer, and stats with no label. The admin's "Add" buttons create these blank.
+  answer, and stats with no label or still labelled "New Stat". The admin's "Add" buttons create
+  these either blank or, for stats, as `0` / `+` / "New Stat".
 
 **QA levels.** *Problems* fail the build: broken internal links, image files that don't exist, an
 `<img>` without an `alt` attribute, a page missing its title, meta description, canonical, or
@@ -132,7 +134,8 @@ pre-tick. Without JavaScript the form posts normally and lands on `thanks.html`.
 ## Search (SEO)
 
 - Canonical base `https://sudsawayprowash.com/`. Every page gets a unique title and meta
-  description, a canonical URL, and Open Graph and Twitter tags with a real photo.
+  description, a canonical URL, and Open Graph and Twitter tags with a real photo. A page without
+  its own photo, such as a text-led service page, uses the home hero photo, so `og:image` is never missing.
 - JSON-LD: a `HomeAndConstructionBusiness` with an `@id` and `areaServed` towns, and no
   `aggregateRating`. The home page gets `FAQPage`; service pages get `Service`,
   `BreadcrumbList`, and `FAQPage`. FAQ markup only covers FAQs visible on that page.
