@@ -7,112 +7,367 @@
     "address": "Whitestown, IN — Serving the Greater Indianapolis Metro Area",
     "hours": "Mon-Sat: 7AM - 7PM | Sun: By Appointment",
     "yearEstablished": 2025,
-    "license": "Licensed & Fully Insured"
+    "license": "Licensed & Fully Insured",
+    "serviceArea": [
+      "Whitestown",
+      "Zionsville",
+      "Indianapolis",
+      "Carmel",
+      "Westfield",
+      "Brownsburg",
+      "Lebanon",
+      "Avon",
+      "Plainfield",
+      "Fishers"
+    ]
   },
   "hero": {
-    "heroImage": "images/logo-2.png",
-    "headline": "Your Property Deserves to Shine",
-    "subheadline": "Professional power washing & soft washing services that restore your home's beauty and protects your investment.",
-    "cta": "Get Your Free Quote",
+    "heroImage": "images/roof-soft-wash-after.jpg",
+    "headline": "Your property\ndeserves to shine.",
+    "subheadline": "Professional power washing and soft washing that restores your home's curb appeal and protects your investment.",
+    "cta": "Get a free estimate",
     "ctaPhone": "Or Call Now:",
     "trustBadges": [
       "Licensed & Insured",
       "100% Satisfaction Guaranteed",
       "Free Estimates",
       "Professional-Grade Equipment"
-    ]
+    ],
+    "heroAlt": "Clean garage roof and siding after a SudsAway soft wash"
   },
   "stats": [
     {
       "number": 100,
       "suffix": "s+",
-      "label": "Properties Cleaned"
+      "label": "Properties Cleaned",
+      "hidden": true
     },
     {
       "number": 5,
       "suffix": "-Star",
-      "label": "Average Rating"
+      "label": "Average Rating",
+      "hidden": true
     },
     {
       "number": 100,
       "suffix": "%",
-      "label": "Satisfaction Guaranteed"
+      "label": "Satisfaction Guaranteed",
+      "hidden": true
     },
     {
       "number": 3,
       "suffix": "+",
-      "label": "Years In Business"
+      "label": "Years In Business",
+      "hidden": true
     }
   ],
   "services": [
     {
       "id": "house-washing",
       "title": "House Washing",
+      "summary": "Siding, brick, and trim cleaned with a low-pressure soft wash.",
       "description": "Restore your home's curb appeal with our safe, effective soft washing system. We gently remove years of dirt, algae, mildew, and grime from siding, brick, stucco, and more — without damaging your surfaces.",
       "icon": "home",
-      "image": "images/work-1.png"
+      "image": "images/siding-soft-wash-after.jpg",
+      "intro": "Most of what makes a house look tired is organic growth: green algae on the shaded side, black mildew spots, and the dirt they hold onto. A soft wash uses cleaning solution at low pressure to kill that growth rather than blast it off, so the siding comes back clean without being forced apart or etched.",
+      "steps": [
+        "Walk the house with you and note anything delicate: light fixtures, outlets, open vents, and plantings.",
+        "Pre-rinse landscaping and cover delicate plants.",
+        "Apply the cleaning solution at low pressure.",
+        "Give it time to break down algae, mildew, and dirt.",
+        "Rinse the house, windows, and surrounding plants thoroughly."
+      ],
+      "surfaces": [
+        "Vinyl siding",
+        "Brick",
+        "Stucco",
+        "Painted wood",
+        "Soffits and fascia",
+        "Trim and shutters"
+      ],
+      "faq": [
+        {
+          "question": "How often should I have my house washed?",
+          "answer": "We recommend exterior house washing every 1-2 years depending on your environment. Homes in shaded or humid areas may benefit from annual cleaning to prevent algae and mildew buildup."
+        },
+        {
+          "question": "Will a soft wash damage my siding?",
+          "answer": "No. Soft washing runs at low pressure (under 500 PSI) and lets the cleaning solution do the work, which is why it's the safe choice for vinyl, painted wood, and stucco."
+        },
+        {
+          "question": "What precautions do you take to protect plants and pets?",
+          "answer": "Our cleaning process uses professional-strength solutions that can be harsh on plants and pets. We take precautions by pre-rinsing landscaping, covering delicate plants, and asking that pets be kept inside during service. We always rinse treated areas thoroughly when finished."
+        }
+      ]
     },
     {
       "id": "roof-cleaning",
       "title": "Roof Cleaning",
+      "summary": "Black streaks and moss removed without high pressure.",
       "description": "Black streaks and moss don't just look bad — they shorten your roof's lifespan. Our soft wash roof cleaning safely eliminates algae and stains, extending your roof's life by years.",
       "icon": "roof",
-      "image": "images/work-2.jpg"
+      "image": "images/roof-soft-wash-after.jpg",
+      "intro": "The dark streaks on so many shingle roofs are algae, and they usually spread across the shaded sections first. Pressure washing a roof knocks off the protective granules shingles depend on. A soft wash kills the algae at low pressure instead, so the streaks lift without wearing the roof down.",
+      "steps": [
+        "Look the roof over and note anything fragile: flashing, vents, skylights, and gutters.",
+        "Pre-rinse and protect the plants below.",
+        "Apply the soft-wash solution at low pressure.",
+        "Let it work on the algae and moss.",
+        "Rinse the gutters, siding, and landscaping below."
+      ],
+      "surfaces": [
+        "Asphalt shingle roofs",
+        "Garage and shed roofs",
+        "Porch and patio roofs"
+      ],
+      "faq": [
+        {
+          "question": "Is soft washing safe for my roof?",
+          "answer": "Absolutely. Soft washing is the method recommended by shingle manufacturers like GAF and CertainTeed. High-pressure washing can damage shingles and void your warranty. Our soft wash method cleans effectively without any risk to your roof."
+        },
+        {
+          "question": "Why not just pressure wash the roof?",
+          "answer": "High pressure strips the granules that protect asphalt shingles and can void a manufacturer's warranty. Soft washing cleans the roof without that wear."
+        }
+      ]
     },
     {
       "id": "driveway-concrete",
       "title": "Driveway & Concrete",
+      "summary": "Driveways, walks, and patios cleaned evenly, without stripes.",
       "description": "Oil stains, tire marks, and years of buildup disappear under our professional-grade surface cleaning equipment. Driveways, sidewalks, patios, and pool decks restored to like-new condition.",
       "icon": "road",
-      "image": "images/logo-1.png"
+      "image": "images/driveway-wash-after.jpg",
+      "intro": "Concrete soaks up dirt, mildew, tire marks, and spills. Flat concrete gets cleaned with a surface cleaner, a spinning, covered spray head that cleans an even path, so the finished driveway doesn't show the stripes a hand-held wand leaves behind.",
+      "steps": [
+        "Clear the area and sweep off loose debris.",
+        "Pre-treat stains and organic growth.",
+        "Clean flat surfaces with a surface cleaner for an even finish.",
+        "Detail edges, steps, and corners by hand.",
+        "Rinse everything clear, including the lawn edges."
+      ],
+      "surfaces": [
+        "Driveways",
+        "Sidewalks and front walks",
+        "Patios",
+        "Pool decks",
+        "Steps and porches"
+      ],
+      "faq": [
+        {
+          "question": "Will pressure washing remove oil stains?",
+          "answer": "It lifts surface grime and newer stains. Old oil that has soaked deep into the concrete often lightens rather than disappearing completely, and we'll tell you what to expect before we start."
+        },
+        {
+          "question": "What's the difference between pressure washing and soft washing?",
+          "answer": "Pressure washing uses high-pressure water (1,300-3,100 PSI) for tough surfaces like concrete and driveways. Soft washing uses low pressure (under 500 PSI) with specialized cleaning solutions, making it safe for delicate surfaces like roofs, siding, and painted wood."
+        }
+      ]
     },
     {
       "id": "deck-fence",
       "title": "Deck & Fence Restoration",
+      "summary": "Wood, composite, and vinyl cleaned and ready for stain or sealer.",
       "description": "Bring your outdoor living spaces back to life. We clean and restore wood, composite, and vinyl decks and fences, prepping them perfectly for staining or sealing.",
       "icon": "fence",
-      "image": "images/logo-2.png"
+      "image": "",
+      "intro": "Decks and fences go gray and green from sun, rain, and mildew. The right cleaning depends on the material: wood needs a gentle touch so the grain doesn't fuzz, while vinyl and composite can take more. Cleaned properly, they're ready for fresh stain or sealer.",
+      "steps": [
+        "Check the material and choose a pressure it can take.",
+        "Apply cleaner to lift dirt, mildew, and graying.",
+        "Rinse with the grain.",
+        "Let everything dry fully before any stain or sealer goes on."
+      ],
+      "surfaces": [
+        "Wood decks",
+        "Composite decks",
+        "Wood fences",
+        "Vinyl fences",
+        "Railings and steps"
+      ],
+      "faq": [
+        {
+          "question": "How long should I wait to stain after cleaning?",
+          "answer": "Until the wood is completely dry, which is usually at least a couple of dry days. Your stain's directions have the final say."
+        }
+      ]
     },
     {
       "id": "commercial",
       "title": "Commercial Washing",
+      "summary": "Storefronts, walks, and lots kept clean on a schedule.",
       "description": "First impressions matter. Keep your storefront, parking lot, drive-through, and building exterior spotless with scheduled commercial power washing services.",
       "icon": "building",
-      "image": "images/logo-2.png"
+      "image": "",
+      "intro": "Customers judge a business before they reach the door. Entrances, sidewalks, drive-throughs, and dumpster pads collect gum, grease, and grime fast. Tell us when your property is quietest and we'll plan the work around your hours.",
+      "steps": [
+        "Walk the property with you and agree on the scope.",
+        "Schedule the work around your business hours.",
+        "Clean, then walk the property again with you.",
+        "Set up repeat visits if you'd like them."
+      ],
+      "surfaces": [
+        "Storefronts and entrances",
+        "Sidewalks",
+        "Parking areas",
+        "Drive-throughs",
+        "Dumpster pads",
+        "Building exteriors"
+      ],
+      "faq": [
+        {
+          "question": "Do you offer recurring service?",
+          "answer": "Yes. Commercial properties can go on a regular schedule so they stay clean between visits."
+        }
+      ]
     },
     {
       "id": "soft-washing",
       "title": "Soft Washing",
+      "summary": "Low-pressure cleaning for roofs, siding, and painted surfaces.",
       "description": "For delicate surfaces that can't handle high pressure. Our soft wash system uses specialized cleaning solutions at low pressure to safely clean roofs, siding, and painted surfaces.",
       "icon": "droplet",
-      "image": "images/work-1.png"
+      "image": "images/soft-wash-siding-after.jpg",
+      "intro": "Soft washing cleans with solution rather than force. A low-pressure spray applies it, it breaks down algae, mildew, and dirt, and a gentle rinse carries everything away. It's the method for anything high pressure could damage, and because it kills growth instead of just moving it, surfaces stay clean longer.",
+      "steps": [
+        "Protect plants and cover outlets and fixtures.",
+        "Apply the cleaning solution at low pressure.",
+        "Give it time to work.",
+        "Rinse thoroughly at low pressure."
+      ],
+      "surfaces": [
+        "Roofs",
+        "Vinyl siding",
+        "Stucco",
+        "Painted wood",
+        "Awnings",
+        "Soffits and fascia"
+      ],
+      "faq": [
+        {
+          "question": "What's the difference between pressure washing and soft washing?",
+          "answer": "Pressure washing uses high-pressure water (1,300-3,100 PSI) for tough surfaces like concrete and driveways. Soft washing uses low pressure (under 500 PSI) with specialized cleaning solutions, making it safe for delicate surfaces like roofs, siding, and painted wood."
+        },
+        {
+          "question": "What precautions do you take to protect plants and pets?",
+          "answer": "Our cleaning process uses professional-strength solutions that can be harsh on plants and pets. We take precautions by pre-rinsing landscaping, covering delicate plants, and asking that pets be kept inside during service. We always rinse treated areas thoroughly when finished."
+        }
+      ]
     }
   ],
   "gallery": [
     {
-      "image": "images/work-1.png",
-      "caption": "House Siding — Soft Wash",
+      "image": "images/driveway-wash-after.jpg",
+      "before": "images/driveway-wash-before.jpg",
+      "after": "images/driveway-wash-after.jpg",
+      "caption": "Driveway",
+      "note": "Dirt and mildew lifted from a curving concrete driveway",
+      "category": "driveway-concrete"
+    },
+    {
+      "image": "images/siding-soft-wash-after.jpg",
+      "before": "images/siding-soft-wash-before.jpg",
+      "after": "images/siding-soft-wash-after.jpg",
+      "caption": "White siding",
+      "note": "Green algae cleaned off a shaded wall",
       "category": "house-washing"
     },
     {
-      "image": "images/work-2.jpg",
-      "caption": "Roof Cleaning — Soft Wash",
+      "image": "images/patio-wash-after.jpg",
+      "before": "images/patio-wash-before.jpg",
+      "after": "images/patio-wash-after.jpg",
+      "caption": "Back patio",
+      "note": "Stains and mildew cleared from a covered patio",
+      "category": "driveway-concrete"
+    },
+    {
+      "image": "images/roof-soft-wash-after.jpg",
+      "before": "images/roof-soft-wash-before.jpg",
+      "after": "images/roof-soft-wash-after.jpg",
+      "caption": "Garage roof",
+      "note": "Dark algae streaks soft washed off the shingles",
       "category": "roof-cleaning"
     },
     {
-      "image": "images/gallery-2-1773761738204.jpeg",
-      "caption": "Driveways",
+      "image": "images/soft-wash-siding-after.jpg",
+      "before": "images/soft-wash-siding-before.jpg",
+      "after": "images/soft-wash-siding-after.jpg",
+      "caption": "Dark siding",
+      "note": "Streaks and grime washed off dark vinyl siding",
+      "category": "soft-washing"
+    },
+    {
+      "image": "images/driveway-pressure-washing-after.jpg",
+      "before": "images/driveway-pressure-washing-before.jpg",
+      "after": "images/driveway-pressure-washing-after.jpg",
+      "caption": "Front driveway",
+      "note": "Same driveway, same day",
+      "category": "driveway-concrete"
+    },
+    {
+      "image": "images/concrete-pressure-washing-in-progress.jpg",
+      "caption": "Mid-clean",
+      "note": "Cleaned concrete next to a section not yet done",
+      "category": "driveway-concrete"
+    },
+    {
+      "image": "images/awning-pressure-washing-after.jpg",
+      "before": "images/awning-pressure-washing-before.jpg",
+      "after": "images/awning-pressure-washing-after.jpg",
+      "caption": "Metal awning",
+      "note": "Dirt and spotting washed off an aluminum awning",
       "category": "general"
     },
     {
-      "image": "images/gallery-3-1773761945026.jpeg",
-      "caption": "Gutters",
+      "image": "images/gutter-cleanout-after.jpg",
+      "before": "images/gutter-cleanout-before.jpg",
+      "after": "images/gutter-cleanout-after.jpg",
+      "caption": "Gutter cleanout",
+      "note": "Leaves and debris cleared from a clogged gutter",
       "category": "general"
     },
     {
-      "image": "images/gallery-4-1773762051608.jpeg",
-      "caption": "Patios",
-      "category": "general"
+      "image": "images/soft-wash-two-story-siding-after.jpg",
+      "before": "images/soft-wash-two-story-siding-before.jpg",
+      "after": "images/soft-wash-two-story-siding-after.jpg",
+      "caption": "Two-story siding",
+      "note": "",
+      "category": "house-washing",
+      "hidden": true
+    },
+    {
+      "image": "images/soft-wash-gray-siding-after.jpg",
+      "before": "images/soft-wash-gray-siding-before.jpg",
+      "after": "images/soft-wash-gray-siding-after.jpg",
+      "caption": "Gray siding",
+      "note": "",
+      "category": "house-washing",
+      "hidden": true
+    },
+    {
+      "image": "images/pressure-wash-front-walk-after.jpg",
+      "before": "images/pressure-wash-front-walk-before.jpg",
+      "after": "images/pressure-wash-front-walk-after.jpg",
+      "caption": "Front walk",
+      "note": "",
+      "category": "driveway-concrete",
+      "hidden": true
+    },
+    {
+      "image": "images/pressure-wash-outdoor-counter-after.jpg",
+      "before": "images/pressure-wash-outdoor-counter-before.jpg",
+      "after": "images/pressure-wash-outdoor-counter-after.jpg",
+      "caption": "Outdoor counter",
+      "note": "",
+      "category": "driveway-concrete",
+      "hidden": true
+    },
+    {
+      "image": "images/fence-wash-before-after.jpg",
+      "caption": "Metal fence",
+      "note": "",
+      "category": "deck-fence",
+      "hidden": true
     }
   ],
   "testimonials": [
@@ -120,25 +375,29 @@
       "name": "Sarah M.",
       "rating": 5,
       "text": "SudsAway completely transformed the look of our home! The siding went from dingy and green to bright white. Couldn't be happier with the results.",
-      "service": "House Washing"
+      "service": "House Washing",
+      "hidden": true
     },
     {
       "name": "James R.",
       "rating": 5,
       "text": "I was amazed at the difference in my roof — those ugly black streaks are completely gone. Professional, on time, and the price was very fair.",
-      "service": "Roof Cleaning"
+      "service": "Roof Cleaning",
+      "hidden": true
     },
     {
       "name": "Linda K.",
       "rating": 5,
       "text": "Our driveway hadn't been cleaned in over 10 years. It looks brand new! Mike was incredibly professional and thorough. Highly recommend!",
-      "service": "Driveway Cleaning"
+      "service": "Driveway Cleaning",
+      "hidden": true
     },
     {
       "name": "John R.",
       "rating": 5,
       "text": "Mike made my house look like it was brand new!",
-      "service": "House Washing"
+      "service": "House Washing",
+      "hidden": true
     }
   ],
   "faq": [
