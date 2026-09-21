@@ -27,42 +27,62 @@ stand behind. SudsAway keeps its own brand so the two sites look related, not id
 
 | Piece | Responsibility |
 |---|---|
-| `data/content.json` | Single source of truth for all copy and lists. Existing keys keep their meaning; new keys are optional. |
-| `build/build.py` | Reads `content.json`, writes the complete site to `site/` (git-ignored): all pages, `sitemap.xml`, `robots.txt`, `llms.txt`. Copies `admin/`, `data/`, and static assets across so `/admin` still works. |
-| `build/images.py` | Every photo in `images/` becomes upright, EXIF-stripped JPG + WebP at 480/800/1280 px in `site/assets/img/`. A crop map splits the stacked before/after composites into separate before and after images. Unchanged sources are skipped so CI stays fast. |
-| `build/qa.py` | Fails the build on broken links, missing images or alt text, bad titles or descriptions, JSON-LD that doesn't parse, heading problems, unlabelled form fields, or colour pairs below WCAG AA. |
+| `data/content.json` | Single source of truth for all copy and lists. Existing keys keep their meaning; new keys are optional. Written with 2-space indent, UTF-8 (no ASCII escaping), and a trailing newline, the same way the admin saves it, so diffs stay clean. |
+| `build/split_composites.py` | One-time script. Splits the five SudsAway before/after composites into separate before and after JPEGs, committed under `images/`. Four are stacked top/bottom; `gallery-3` is side-by-side. It trims off the printed "Before"/"After" labels and the "BeforeAfter" app badge wherever a small crop does it, since the sliders add their own labels. |
+| `build/build.py` | Reads `content.json` and writes the complete site to `site/` (git-ignored): all pages, `sitemap.xml`, `robots.txt`, `llms.txt`. Copies `admin/` to `site/admin/` and `images/` to `site/images/`: the admin reads content and config from GitHub, but its photo previews load `../images/…` from the published site. `data/` isn't published. |
+| `build/images.py` | Pillow only: its own WebP encoder, no `cwebp` or `sips`, since sources are JPEG/PNG. Every photo in `images/` becomes upright, EXIF-stripped JPG + WebP at 480/800/1280 px (never upscaled) in `site/assets/img/`. An output is regenerated only if it's missing or older than its source: locally that skips unchanged photos, and in CI each run starts clean and regenerates everything, which takes well under a minute for about 25 photos. |
+| `build/qa.py` | Fails on broken links, missing images or alt text, bad titles or descriptions, JSON-LD that doesn't parse, heading problems, unlabelled form fields, or colour pairs below WCAG AA. Skips `site/admin/`. See **Robustness**: nothing the admin can save may make QA fail. |
 | `build/devserver.py` | Local preview of `site/` with caching disabled; `.claude/launch.json` points at it. |
 | `assets/` | Hand-written `css/site.css`, `js/site.js`, logo, favicon. Replaces the old root `index.html`, `css/`, `js/` (preserved in the backup tag). |
 | `.github/workflows/deploy.yml` | Adds Python + Pillow, runs images → build → QA, and publishes `site/` instead of the repo root. Inert until merged. |
 
 Data flow: admin save or local edit → `content.json` / `images/` → push to `main` → Action
-runs images, build, QA → Pages publishes `site/`. The admin's "updates in about 30 seconds"
-message changes to "a minute or two"; that is the only admin change.
+runs images, build, QA → Pages publishes `site/`. The admin gets two copy changes and nothing
+else: the save message says the site updates in "a minute or two" instead of "about 30 seconds",
+and the hero image hint describes the new portrait-friendly crop instead of "1920 × 1080 landscape".
 
-## Content model additions
+## Content model
 
-All optional. The admin preserves them but can't edit them yet.
+Every image reference is a plain repo path under `images/`, the same way the admin writes them.
+All new fields are optional. The admin preserves them but can't edit them yet.
 
 - `business.serviceArea`: list of towns. Starts with the ten Cline lists for washing
   (Whitestown, Zionsville, Indianapolis, Carmel, Westfield, Brownsburg, Lebanon, Avon,
   Plainfield, Fishers) and is flagged for Mike to confirm.
-- `services[]`: the existing `id` becomes the URL slug. Adds `summary`, `intro`, `steps[]`,
-  `surfaces[]`, and `faq[]` for the service page.
-- `gallery[]`: an item has either `image` (as today) or `before` + `after`, plus `caption`,
-  optional `note`, and `category` (a service `id`, or `general`). Pairs render as sliders,
-  single images as plain figures, so photos uploaded through the admin still appear.
-- **`hidden: true` on any list item** (testimonials, stats, gallery) means the build skips it.
-  A section with nothing visible isn't rendered. The four existing testimonials and the four
-  stats start hidden until Mike confirms them; anything added through the admin shows by default.
+- `hero`: the split hero reads `headline` (a `\n` splits off the accent line, as today),
+  `subheadline`, `cta`, `heroImage`, and `trustBadges`, so the admin's hero editor keeps working.
+- `services[]`: the existing `id` becomes the URL slug, and `image` is the service page photo.
+  Adds `summary`, `intro`, `steps[]`, `surfaces[]`, and `faq[]` for the service page.
+- `gallery[]`: an item is a **pair** when `before` and `after` both name existing files. Pairs
+  render as sliders and take precedence over `image`; a pair's `image` is set to its after photo
+  so the admin's list shows a thumbnail. Otherwise, an item whose `image` exists renders as a
+  single photo, so admin uploads still appear. Anything else is skipped with a build warning.
+  `category` is a service `id`; unknown values count as `general`. Optional `note` is a caption line.
+- `stats[]`: rendered as a static strip on the home page when any are visible. There's no count-up animation.
+- **`hidden: true` on any object in any top-level list** (services, gallery, testimonials, stats,
+  faq, about.values) makes the build skip it. A section with nothing visible isn't rendered.
+  The four existing testimonials and the four stats start hidden until Mike confirms them.
+  Anything added through the admin shows by default.
+
+## Robustness
+
+A failed deploy is silent on Mike's side, because the admin still says "Changes saved!". So nothing
+the admin can save may fail the build or QA; QA failures are reserved for real code bugs.
+- Every visible `services[]` entry gets a page. Ids are slugified and de-duplicated. An empty
+  description falls back to a sentence built from the title, and an unknown icon falls back to a default.
+- Empty or missing images (for example the admin's default `images/placeholder.png`) are skipped
+  with a warning, and the page renders without them.
+- Unknown gallery categories count as `general`.
 
 ## Pages
 
 - **Home** (`index.html`, same URL as today): split hero with a real job photo, headline,
-  estimate button and phone; trust badges from `hero.trustBadges`; the six services as
-  numbered rows linking to their pages; three before/after sliders linking to the gallery;
+  estimate button and phone; trust badges from `hero.trustBadges`; the stats strip (only if
+  any are visible); the services as numbered rows linking to their pages; the first three
+  visible before/after pairs in gallery order as sliders, linking to the gallery;
   "Why SudsAway" from `about`; reviews (only if any are visible); service area; FAQ;
   estimate call-to-action band; footer with name, phone, email, hours, and area.
-- **Six service pages** (`services/<id>.html`): breadcrumb, H1, summary and intro, how it's
+- **A page per visible service** (`services/<id>.html`; six today): breadcrumb, H1, summary and intro, how it's
   done, surfaces cleaned, that service's before/after pairs, its FAQs, related services, and
   an estimate button linking to `contact.html?service=<id>`. Pages without a real photo use
   a text-led header rather than a stand-in.
@@ -104,13 +124,14 @@ pre-tick. Without JavaScript the form posts normally and lands on `thanks.html`.
   `aggregateRating`. The home page gets `FAQPage`; service pages get `Service`,
   `BreadcrumbList`, and `FAQPage`. FAQ markup only covers FAQs visible on that page.
 - `sitemap.xml` with `lastmod` and image entries, plus `robots.txt` and `llms.txt`.
+  `/admin/` is left out of the sitemap and disallowed in `robots.txt`.
 
 ## Images
 
 - **Real photos for anything that represents the work.** Sources are the five SudsAway
-  before/after composites, split into pairs, plus seven washing pairs and one fence composite
-  copied from the Cline repo's 1280 px renditions. The user approved the reuse; it's flagged
-  for Mike.
+  before/after composites (split by `build/split_composites.py`), plus seven washing pairs and
+  one fence composite copied into `images/` from the Cline repo's 1280 px renditions. The fence
+  composite stays a single image. The user approved the reuse; it's flagged for Mike.
 - **Stock photos are dropped.** `logo-2.png` (the hero) and `logo-1.png` are stock; references
   to them are replaced with real photos. The files stay in `images/` in case the admin still
   points at them.
@@ -133,8 +154,9 @@ A new file for this site, in the same format as Cline's:
    change. The user reviews on localhost.
 2. **Depth:** service pages, gallery, sitemap, robots, and llms.txt; QA reports zero problems.
    The user reviews again.
-3. **Ship, only on an explicit OK:** merge to `main`, push, verify the live site, and walk
-   Mike through form activation.
+3. **Ship, only on an explicit OK:** first fetch `origin/main` and fold in any admin commits
+   made since `backup/pre-rebuild`, so none of Mike's edits are lost. Then merge to `main`,
+   push, verify the live site, and walk Mike through form activation.
 
 ## Testing
 
@@ -143,8 +165,11 @@ A new file for this site, in the same format as Cline's:
   work by mouse, touch, and keyboard; the drawer menu opens and closes; form validation and
   the subject builder work with `fetch` stubbed, so nothing is sent to Mike's inbox. Content
   is visible with JavaScript disabled.
-- `/admin` still loads from `site/`. Admin saves are not tested, because they write to the real
-  GitHub `main` and would deploy it.
+- Robustness: a scratch copy of `content.json` with what the admin's "Add" buttons produce
+  (a service with `images/placeholder.png` and an empty description, a gallery item with
+  `image: ""`, an unknown category, an edited service `id`) must build and pass QA.
+- `/admin` still loads from `site/`, and its photo previews resolve. Admin saves are not tested,
+  because they write to the real GitHub `main` and would deploy it.
 
 ## Out of scope
 
