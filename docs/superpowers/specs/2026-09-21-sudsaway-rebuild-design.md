@@ -28,10 +28,10 @@ stand behind. SudsAway keeps its own brand so the two sites look related, not id
 | Piece | Responsibility |
 |---|---|
 | `data/content.json` | Single source of truth for all copy and lists. Existing keys keep their meaning; new keys are optional. Written with 2-space indent, UTF-8 (no ASCII escaping), and a trailing newline, the same way the admin saves it, so diffs stay clean. |
-| `build/split_composites.py` | One-time script. Splits the five SudsAway before/after composites into separate before and after JPEGs, committed under `images/`. Four are stacked top/bottom; `gallery-3` is side-by-side. It trims off the printed "Before"/"After" labels and the "BeforeAfter" app badge wherever a small crop does it, since the sliders add their own labels. |
+| `build/split_composites.py` | One-time script. Splits the five SudsAway before/after composites into separate before and after JPEGs, committed under `images/`. Four are stacked top/bottom; `gallery-3` is side-by-side. It trims off the printed "Before"/"After" labels and the "BeforeAfter" app badge wherever a small crop does it, since the sliders add their own labels. Both halves of a pair get the same crop box, so the slider lines up. |
 | `build/build.py` | Reads `content.json` and writes the complete site to `site/` (git-ignored): all pages, `sitemap.xml`, `robots.txt`, `llms.txt`. Copies `admin/` to `site/admin/` and `images/` to `site/images/`: the admin reads content and config from GitHub, but its photo previews load `../images/…` from the published site. `data/` isn't published. |
 | `build/images.py` | Pillow only: its own WebP encoder, no `cwebp` or `sips`, since sources are JPEG/PNG. Every photo in `images/` becomes upright, EXIF-stripped JPG + WebP at 480/800/1280 px (never upscaled) in `site/assets/img/`. An output is regenerated only if it's missing or older than its source: locally that skips unchanged photos, and in CI each run starts clean and regenerates everything, which takes well under a minute for about 25 photos. |
-| `build/qa.py` | Fails on broken links, missing images or alt text, bad titles or descriptions, JSON-LD that doesn't parse, heading problems, unlabelled form fields, or colour pairs below WCAG AA. Skips `site/admin/`. See **Robustness**: nothing the admin can save may make QA fail. |
+| `build/qa.py` | Checks every built page except `site/admin/`. It reports problems, which fail the build, and warnings, which don't; the split is defined under **Robustness → QA levels**. Nothing the admin can save may produce a problem. |
 | `build/devserver.py` | Local preview of `site/` with caching disabled; `.claude/launch.json` points at it. |
 | `assets/` | Hand-written `css/site.css`, `js/site.js`, logo, favicon. Replaces the old root `index.html`, `css/`, `js/` (preserved in the backup tag). |
 | `.github/workflows/deploy.yml` | Adds Python + Pillow, runs images → build → QA, and publishes `site/` instead of the repo root. Inert until merged. |
@@ -53,11 +53,13 @@ All new fields are optional. The admin preserves them but can't edit them yet.
   `subheadline`, `cta`, `heroImage`, and `trustBadges`, so the admin's hero editor keeps working.
 - `services[]`: the existing `id` becomes the URL slug, and `image` is the service page photo.
   Adds `summary`, `intro`, `steps[]`, `surfaces[]`, and `faq[]` for the service page.
-- `gallery[]`: an item is a **pair** when `before` and `after` both name existing files. Pairs
-  render as sliders and take precedence over `image`; a pair's `image` is set to its after photo
-  so the admin's list shows a thumbnail. Otherwise, an item whose `image` exists renders as a
-  single photo, so admin uploads still appear. Anything else is skipped with a build warning.
-  `category` is a service `id`; unknown values count as `general`. Optional `note` is a caption line.
+- `gallery[]`: an item is a **pair** when `before` and `after` both name existing files **and**
+  `image` is empty or equal to `after`. Pairs render as sliders; a pair's `image` is set to its
+  after photo so the admin's list shows a thumbnail. If Mike replaces that photo in the admin,
+  `image` no longer equals `after`, so the item becomes a single photo showing his new upload.
+  A replacement is never silently ignored. Otherwise, an item whose `image` exists renders as a
+  single photo, and anything else is skipped with a build warning. `category` is a service `id`;
+  unknown values count as `general`. Optional `note` is a caption line.
 - `stats[]`: rendered as a static strip on the home page when any are visible. There's no count-up animation.
 - **`hidden: true` on any object in any top-level list** (services, gallery, testimonials, stats,
   faq, about.values) makes the build skip it. A section with nothing visible isn't rendered.
@@ -68,11 +70,22 @@ All new fields are optional. The admin preserves them but can't edit them yet.
 
 A failed deploy is silent on Mike's side, because the admin still says "Changes saved!". So nothing
 the admin can save may fail the build or QA; QA failures are reserved for real code bugs.
-- Every visible `services[]` entry gets a page. Ids are slugified and de-duplicated. An empty
-  description falls back to a sentence built from the title, and an unknown icon falls back to a default.
+- Every visible `services[]` entry gets a page. Ids are slugified and de-duplicated
+  (`new-service`, `new-service-2`). An empty description falls back to a sentence built from
+  the title, and an unknown icon falls back to a default.
 - Empty or missing images (for example the admin's default `images/placeholder.png`) are skipped
   with a warning, and the page renders without them.
 - Unknown gallery categories count as `general`.
+- Alt text is never empty for a content image: a blank caption falls back to a description
+  built from the category, such as "House washing before and after".
+- Half-finished entries are skipped: testimonials with no text or name, FAQs with no question or
+  answer, and stats with no label. The admin's "Add" buttons create these blank.
+
+**QA levels.** *Problems* fail the build: broken internal links, image files that don't exist, an
+`<img>` without an `alt` attribute, a page missing its title, meta description, canonical, or
+single H1, JSON-LD that doesn't parse, an unlabelled form field, or a CSS colour token pair
+below AA. *Warnings* are printed but never fail: title or description length, and duplicate
+titles or descriptions across pages (for example, two services both called "New Service").
 
 ## Pages
 
@@ -134,7 +147,9 @@ pre-tick. Without JavaScript the form posts normally and lands on `thanks.html`.
   composite stays a single image. The user approved the reuse; it's flagged for Mike.
 - **Stock photos are dropped.** `logo-2.png` (the hero) and `logo-1.png` are stock; references
   to them are replaced with real photos. The files stay in `images/` in case the admin still
-  points at them.
+  points at them. Every existing reference to a composite (`hero.heroImage`, and the
+  `services[].image` entries pointing at `work-1.png` and `work-2.jpg`) switches to the
+  split "after" photo or another real single photo, so no page shows the labelled, badged composites.
 - **Generated images** (headless Codex; user-approved) are only for clearly illustrative
   material, such as a soft-wash vs pressure-wash explainer, and are captioned "Illustration".
   Never before/after pairs, and never a photoreal scene presented as a SudsAway job.
@@ -165,9 +180,11 @@ A new file for this site, in the same format as Cline's:
   work by mouse, touch, and keyboard; the drawer menu opens and closes; form validation and
   the subject builder work with `fetch` stubbed, so nothing is sent to Mike's inbox. Content
   is visible with JavaScript disabled.
-- Robustness: a scratch copy of `content.json` with what the admin's "Add" buttons produce
-  (a service with `images/placeholder.png` and an empty description, a gallery item with
-  `image: ""`, an unknown category, an edited service `id`) must build and pass QA.
+- Robustness: a scratch copy of `content.json` with what the admin's "Add" buttons produce must
+  build and pass QA with warnings only. That means two added services (each with
+  `images/placeholder.png` and an empty description), a gallery item with `image: ""`, a gallery
+  item with a blank caption, an unknown category, an edited service `id`, a blank testimonial,
+  a blank FAQ, and a pair whose `image` was replaced.
 - `/admin` still loads from `site/`, and its photo previews resolve. Admin saves are not tested,
   because they write to the real GitHub `main` and would deploy it.
 
