@@ -160,6 +160,7 @@ a { color: var(--blue-ink); text-underline-offset: .18em; }
 .burger[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
 .burger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 @media (min-width: 1024px) { .burger { display: none; } }
+.no-js .burger { display: none; } /* the drawer needs JS; the footer carries every link */
 
 .drawer {
   position: fixed; inset: var(--hdr-h) 0 0 0; z-index: 49; overflow-y: auto;

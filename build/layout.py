@@ -1,5 +1,6 @@
 """Page chrome: <head>, header, mobile drawer, footer, and shared sections."""
-from markup import BASE, esc, icon, json_ld
+import markup
+from markup import esc, icon, json_ld
 
 FONTS = ("https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;"
          "9..40,600;9..40,700&family=Outfit:wght@500;600;700;800&display=swap")
@@ -35,7 +36,7 @@ def head(m, title, desc, path, og_image=None, ld=(), noindex=False):
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{esc(title)}</title>
 <meta name="description" content="{esc(desc)}">
-<link rel="canonical" href="{BASE}{path}">
+<link rel="canonical" href="{markup.BASE}{path}">
 <meta name="robots" content="{robots}">
 <meta name="theme-color" content="#0a2463">
 <meta name="format-detection" content="telephone=yes">
@@ -43,7 +44,7 @@ def head(m, title, desc, path, og_image=None, ld=(), noindex=False):
 <meta property="og:site_name" content="{esc(m.business.name)}">
 <meta property="og:title" content="{esc(title)}">
 <meta property="og:description" content="{esc(desc)}">
-<meta property="og:url" content="{BASE}{path}">
+<meta property="og:url" content="{markup.BASE}{path}">
 <meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{esc(title)}">
@@ -82,6 +83,7 @@ def header(m, active=""):
     call = (f'<a class="btn btn--primary drawer__call" href="tel:{tel}">{icon("phone")} '
             f'Call {esc(m.business.phone)}</a>') if tel else ""
     svc_active = ' class="is-active"' if active in {s.id for s in m.services} else ""
+    faq = '<a href="/#faq">FAQ</a>' if m.faq else ""  # the #faq section only exists when there are FAQs
     return f"""<header class="hdr">
 <div class="hdr__in">
   {_brand(m)}
@@ -91,7 +93,7 @@ def header(m, active=""):
       <div class="sub">{subs}</div>
     </div>
     <a href="/gallery.html"{cur("gallery")}>Our Work</a>
-    <a href="/#faq">FAQ</a>
+    {faq}
     <a href="/contact.html"{cur("contact")}>Contact</a>
   </nav>
   <div class="hdr__cta">
@@ -108,7 +110,7 @@ def header(m, active=""):
   {drawer_svcs}
   <p class="drawer__grp">Company</p>
   <a href="/gallery.html">Our Work</a>
-  <a href="/#faq">FAQ</a>
+  {faq}
   <a href="/contact.html">Get a free estimate</a>
   {call}
 </div>
@@ -147,7 +149,7 @@ def footer(m):
       <h2 class="ftr__h">Company</h2>
       <ul class="ftr__list">
         <li><a href="/gallery.html">Our Work</a></li>
-        <li><a href="/#faq">FAQ</a></li>
+        {'<li><a href="/#faq">FAQ</a></li>' if m.faq else ""}
         <li><a href="/contact.html">Free estimate</a></li>
       </ul>
     </div>

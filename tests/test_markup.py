@@ -1,3 +1,4 @@
+import json
 import os
 import re
 import sys
@@ -33,6 +34,16 @@ class Picture(unittest.TestCase):
 
     def test_missing_renditions_render_nothing(self):
         self.assertEqual(markup.picture(NS(slug=None, w=0, h=0, alt="", widths=[]), BOX_4_3), "")
+
+
+class JsonLd(unittest.TestCase):
+    def test_markup_characters_are_escaped_but_round_trip(self):
+        data = {"text": "<!--<script></script> & more"}
+        tag = markup.json_ld(data)
+        inner = tag[len('<script type="application/ld+json">'):-len("</script>")]
+        self.assertNotIn("<", inner)
+        self.assertNotIn(">", inner)
+        self.assertEqual(json.loads(inner), data)
 
 
 if __name__ == "__main__":

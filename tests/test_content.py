@@ -130,6 +130,14 @@ class Hero(unittest.TestCase):
         self.assertEqual((m.hero.line1, m.hero.line2), ("Your property", "deserves to shine."))
         self.assertEqual(m.hero.image.path, "images/a.jpg")
 
+    def test_hero_alt_only_used_for_the_photo_it_describes(self):
+        root = repo_with("images/b.jpg", "images/a.jpg", "images/new.jpg")
+        hero = {"headline": "X", "heroImage": "images/a.jpg", "heroAlt": "A clean driveway",
+                "heroAltFor": "images/a.jpg"}
+        self.assertEqual(model(root, hero=hero).hero.image.alt, "A clean driveway")
+        hero["heroImage"] = "images/new.jpg"  # replaced in the admin; the alt no longer fits
+        self.assertEqual(model(root, hero=hero).hero.image.alt, "A recent SudsAway ProWash job")
+
     def test_phone_href(self):
         m = model(repo_with())
         self.assertEqual(m.business.tel, "+17083342685")

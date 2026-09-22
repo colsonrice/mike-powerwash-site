@@ -177,7 +177,11 @@ def normalise(raw, root):
 
     h = raw.get("hero") or {}
     parts = [p.strip() for p in str(h.get("headline") or "").split("\n") if p.strip()] or [name]
-    hero_alt = _s(h.get("heroAlt")) or f"A recent {name} job"
+    # heroAlt describes one specific photo (heroAltFor). The admin can swap heroImage but can't
+    # edit the alt, so a stale description is dropped rather than shown for the wrong photo.
+    hero_path = _clean_path(h.get("heroImage"))
+    hero_alt = (_s(h.get("heroAlt")) if hero_path and _clean_path(h.get("heroAltFor")) == hero_path else "")
+    hero_alt = hero_alt or afters.get(hero_path) or f"A recent {name} job"
     hero_img = imgs.get(h.get("heroImage"), hero_alt, "hero")
     if not hero_img:
         first_pair = next((g for g in gallery if g.kind == "pair"), None)

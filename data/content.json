@@ -33,7 +33,8 @@
       "Free Estimates",
       "Professional-Grade Equipment"
     ],
-    "heroAlt": "A long concrete driveway, freshly pressure washed, curving past a green lawn"
+    "heroAlt": "A long concrete driveway, freshly pressure washed, curving past a green lawn",
+    "heroAltFor": "images/driveway-pressure-washing-after.jpg"
   },
   "stats": [
     {

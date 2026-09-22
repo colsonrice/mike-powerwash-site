@@ -3,7 +3,10 @@ import json
 import re
 from html import escape
 
-BASE = "https://sudsawayprowash.com"
+PRODUCTION_BASE = "https://sudsawayprowash.com"
+# Absolute URLs (canonical, Open Graph, structured data) start here; build.py points it at
+# the demo URL for demo builds so link previews resolve there.
+BASE = PRODUCTION_BASE
 
 
 def esc(text):
@@ -11,9 +14,11 @@ def esc(text):
 
 
 def json_ld(data):
-    # "</" inside JSON would close the script element early
-    return ('<script type="application/ld+json">'
-            + json.dumps(data, ensure_ascii=False).replace("</", "<\\/") + "</script>")
+    # Admin text like "</script>" or "<!--<script" can end or derail the script element,
+    # so markup characters are written as JSON unicode escapes, which parse back unchanged.
+    text = json.dumps(data, ensure_ascii=False)
+    text = text.replace("&", "\\u0026").replace("<", "\\u003c").replace(">", "\\u003e")
+    return f'<script type="application/ld+json">{text}</script>'
 
 
 ICON_PATHS = {

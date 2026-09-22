@@ -90,7 +90,8 @@
     ba.addEventListener('pointercancel', end);
     ba.addEventListener('lostpointercapture', end);
     ba.addEventListener('keydown', function (e) {
-      var now = parseFloat(ba.getAttribute('aria-valuenow')) || 50;
+      var current = parseFloat(ba.getAttribute('aria-valuenow'));
+      var now = isNaN(current) ? 50 : current;
       var next = { ArrowLeft: now - 5, ArrowDown: now - 5, ArrowRight: now + 5, ArrowUp: now + 5,
                    PageDown: now - 20, PageUp: now + 20, Home: 0, End: 100 }[e.key];
       if (next === undefined) return;
@@ -131,6 +132,8 @@
   /* ---------- Estimate form ---------- */
   var form = document.querySelector('.qform');
   if (form) {
+    // Without JS the browser's own required-field checks apply; with it, these inline ones do.
+    form.noValidate = true;
     var ok = document.querySelector('.qok');
     var sendErr = form.querySelector('.qsend-err');
     var digits = function (v) { return (v || '').replace(/\D/g, ''); };

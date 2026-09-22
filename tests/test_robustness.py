@@ -7,6 +7,7 @@ import copy
 import io
 import json
 import os
+import re
 import sys
 import tempfile
 import unittest
@@ -74,6 +75,54 @@ class AdminEdgeCases(unittest.TestCase):
             gallery = f.read()
         self.assertIn("gutter-cleanout-after", gallery)
         self.assertIn("Replaced photo", gallery)
+
+
+def build_and_check(content, *extra):
+    tmp = tempfile.mkdtemp()
+    out = os.path.join(tmp, "site")
+    fixture = os.path.join(tmp, "content.json")
+    with open(fixture, "w", encoding="utf-8") as f:
+        json.dump(content, f, ensure_ascii=False, indent=2)
+    with redirect_stdout(io.StringIO()):
+        build.main(["--content", fixture, "--out", out, *extra])
+    with redirect_stdout(io.StringIO()) as log:
+        status = qa.main(["--site", out] + (["--base-path", "/demo"] if extra else []))
+    return out, status, log.getvalue()
+
+
+class NoFaqs(unittest.TestCase):
+    def test_deleting_every_faq_still_builds_clean(self):
+        for faqs in ([], [{"question": "New Question?", "answer": ""}]):
+            c = admin_edge_content()
+            c["faq"] = faqs
+            out, status, log = build_and_check(c)
+            self.assertEqual(status, 0, log)
+            with open(os.path.join(out, "index.html"), encoding="utf-8") as f:
+                self.assertNotIn("#faq", f.read())
+
+
+class HostileText(unittest.TestCase):
+    def test_script_breaking_text_in_faq_keeps_page_intact(self):
+        c = admin_edge_content()
+        c["faq"][0]["answer"] = "Use the <!--<script> trick?</script> & more"
+        out, status, log = build_and_check(c)
+        self.assertEqual(status, 0, log)
+        with open(os.path.join(out, "index.html"), encoding="utf-8") as f:
+            html = f.read()
+        self.assertNotIn("<!--<script>", html)
+        self.assertEqual(html.count("<script"), html.count("</script>"))
+
+
+class DemoBuild(unittest.TestCase):
+    def test_demo_previews_point_at_the_demo(self):
+        out, status, log = build_and_check(admin_edge_content(), "--demo-url", "https://example.com/demo")
+        self.assertEqual(status, 0, log)
+        with open(os.path.join(out, "index.html"), encoding="utf-8") as f:
+            html = f.read()
+        og = re.search(r'property="og:image" content="([^"]+)"', html).group(1)
+        self.assertTrue(og.startswith("https://example.com/demo/assets/img/"), og)
+        self.assertTrue(os.path.exists(os.path.join(out, og.split("/demo/", 1)[1])))
+        self.assertNotIn("sudsawayprowash.com/assets", html)
 
 
 if __name__ == "__main__":

@@ -25,7 +25,8 @@ import layout  # noqa: E402
 import pages  # noqa: E402
 import renditions  # noqa: E402
 import seo  # noqa: E402
-from markup import BASE, img_url  # noqa: E402
+import markup  # noqa: E402
+from markup import img_url  # noqa: E402
 
 
 def _short_hash(path):
@@ -88,7 +89,8 @@ def main(argv=None):
     demo = args.demo_url.rstrip("/") if args.demo_url else None
     prefix = urlparse(demo).path.rstrip("/") if demo else ""
     layout.NOINDEX_ALL = bool(demo)
-    pages.FORM_NEXT = (demo or BASE) + "/thanks.html"
+    markup.BASE = demo or markup.PRODUCTION_BASE
+    pages.FORM_NEXT = markup.BASE + "/thanks.html"
 
     raw = content.load(args.content)
     m = content.normalise(raw, args.root)
@@ -128,9 +130,9 @@ def main(argv=None):
     else:
         indexed = [{"loc": "/" if p.path == "/index.html" else p.path, "images": p.images}
                    for p in built if p.indexed]
-        _write(args.out, "/sitemap.xml", seo.sitemap(indexed, BASE, datetime.date.today().isoformat()))
-        _write(args.out, "/robots.txt", seo.robots(BASE))
-        _write(args.out, "/llms.txt", seo.llms(m, BASE))
+        _write(args.out, "/sitemap.xml", seo.sitemap(indexed, markup.BASE, datetime.date.today().isoformat()))
+        _write(args.out, "/robots.txt", seo.robots(markup.BASE))
+        _write(args.out, "/llms.txt", seo.llms(m, markup.BASE))
 
     print(f"built {len(built)} pages, {len(manifest)} photos -> {os.path.relpath(args.out, ROOT)}")
     return 0

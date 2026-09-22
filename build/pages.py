@@ -3,7 +3,8 @@ from collections import namedtuple
 
 import seo
 from layout import cta_band, crumbs, faq_list, footer, head, header
-from markup import BASE, esc, icon, icon_for, img_url, picture, shot
+import markup
+from markup import esc, icon, icon_for, img_url, picture, shot
 
 Page = namedtuple("Page", "path html images indexed")
 
@@ -11,7 +12,7 @@ Page = namedtuple("Page", "path html images indexed")
 # email shown on the site is edited in the admin panel.
 FORM_ADDRESS = "sudsawayprowash@yahoo.com"
 # Where FormSubmit sends people when JavaScript is off; demo builds point at the demo.
-FORM_NEXT = BASE + "/thanks.html"
+FORM_NEXT = markup.PRODUCTION_BASE + "/thanks.html"
 # (media query, width of the photo's box, the box's aspect ratio) -- see markup.sizes_attr.
 SLIDER_SIZES_3 = [("(max-width: 719px)", "92vw", 4 / 3), ("(max-width: 1079px)", "46vw", 4 / 3),
                   (None, "370px", 4 / 3)]
@@ -21,7 +22,7 @@ PHEAD_SIZES = [("(max-width: 959px)", "100vw", 4 / 3), (None, "50vw", 1.15)]
 
 
 def _ld(m):
-    return seo.business_ld(m, BASE, m.og_default)
+    return seo.business_ld(m, markup.BASE, m.og_default)
 
 
 def _hero_acts(m, href="/contact.html", label=None):
@@ -240,8 +241,8 @@ def service(m, s):
 </main>
 """
     og = img_url(s.image)
-    ld = [_ld(m), seo.breadcrumb_ld([("Home", "/"), (s.title, path)], BASE),
-          seo.service_ld(s, m, BASE, og), seo.faq_ld(s.faq)]
+    ld = [_ld(m), seo.breadcrumb_ld([("Home", "/"), (s.title, path)], markup.BASE),
+          seo.service_ld(s, m, markup.BASE, og), seo.faq_ld(s.faq)]
     images = [u for u in [og] if u] + _gallery_images(items)
     return Page(path, head(m, title, desc, path, og_image=og, ld=ld) + header(m, s.id) + body + footer(m),
                 images, True)
@@ -286,7 +287,7 @@ def gallery(m):
 {cta_band(m, "Want results like these?")}
 </main>
 """
-    ld = [_ld(m), seo.breadcrumb_ld([("Home", "/"), ("Our Work", "/gallery.html")], BASE)]
+    ld = [_ld(m), seo.breadcrumb_ld([("Home", "/"), ("Our Work", "/gallery.html")], markup.BASE)]
     return Page("/gallery.html", head(m, title, desc, "/gallery.html", ld=ld) + header(m, "gallery") + body
                 + footer(m), _gallery_images(m.gallery), True)
 
@@ -329,7 +330,7 @@ def contact(m):
         <b>Thanks, your request is on its way.</b>
         <span>We'll get back to you soon.{urgent}</span>
       </div>
-      <form class="qform" method="POST" action="https://formsubmit.co/{FORM_ADDRESS}" novalidate>
+      <form class="qform" method="POST" action="https://formsubmit.co/{FORM_ADDRESS}">
         <input type="hidden" name="_subject" value="[SudsAway Web] New estimate request">
         <input type="hidden" name="_replyto" value="">
         <input type="hidden" name="_next" value="{FORM_NEXT}">
@@ -391,7 +392,7 @@ def contact(m):
 </section>
 </main>
 """
-    ld = [_ld(m), seo.breadcrumb_ld([("Home", "/"), ("Contact", "/contact.html")], BASE)]
+    ld = [_ld(m), seo.breadcrumb_ld([("Home", "/"), ("Contact", "/contact.html")], markup.BASE)]
     return Page("/contact.html", head(m, title, desc, "/contact.html", ld=ld) + header(m, "contact") + body
                 + footer(m), [], True)
 
