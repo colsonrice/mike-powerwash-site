@@ -303,6 +303,7 @@ def contact(m):
         direct.append(f'<p>{icon("clock")}<span class="direct__hours">{hours}</span></p>')
     direct.append(f'<p>{icon("pin")}<span>{esc(", ".join(m.area))}</span></p>')
     call_err = (f' or call <a href="tel:{b.tel}">{esc(b.phone)}</a>' if b.tel else "")
+    urgent = (f' If it\'s urgent, call <a href="tel:{b.tel}">{esc(b.phone)}</a>.' if b.tel else "")
     title = f"Free Estimate | {b.phone} | {b.name}" if b.phone else f"Free Estimate | {b.name}"
     desc = ("Request a free power washing or soft washing estimate in Whitestown and Greater "
             f"Indianapolis. Call {b.phone} or send the form.")
@@ -323,7 +324,7 @@ def contact(m):
       <h2 class="h-2">Request an estimate</h2>
       <div class="qok" role="status" tabindex="-1" hidden>
         <b>Thanks, your request is on its way.</b>
-        <span>We'll get back to you soon.{(" If it's urgent, call <a href=\"tel:" + b.tel + "\">" + esc(b.phone) + "</a>.") if b.tel else ""}</span>
+        <span>We'll get back to you soon.{urgent}</span>
       </div>
       <form class="qform" method="POST" action="https://formsubmit.co/{FORM_ADDRESS}" novalidate>
         <input type="hidden" name="_subject" value="[SudsAway Web] New estimate request">

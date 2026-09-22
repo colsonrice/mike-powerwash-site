@@ -587,7 +587,7 @@
       hasUnsavedChanges = false;
       updateUnsavedUI();
       hideLoading();
-      showToast('Changes saved! Your website will update in about 30 seconds.', 'success', 5000);
+      showToast('Changes saved! Your website will update in a minute or two.', 'success', 5000);
     } catch (err) {
       hideLoading();
       showToast('Save failed: ' + err.message, 'error', 6000);
@@ -1038,8 +1038,8 @@
     if (zoneContainer) {
       zoneContainer.innerHTML =
         '<div class="form-group full-width">' +
-          '<label>Hero Background Image</label>' +
-          '<p class="drop-zone-hint">Recommended: <strong>1920 &times; 1080 px</strong> (landscape). JPG or PNG, under 5 MB.</p>' +
+          '<label>Hero Photo</label>' +
+          '<p class="drop-zone-hint">Shown beside the headline and cropped to fit, so a clear, well-lit photo of a finished job works best. JPG or PNG, under 5 MB.</p>' +
         '</div>' +
         dropZoneHtml(h.heroImage || '', 'hero', 0, 'heroImage');
       bindDropZones(zoneContainer);
