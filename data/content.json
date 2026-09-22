@@ -270,7 +270,7 @@
       "before": "images/siding-soft-wash-before-restored.jpg",
       "after": "images/siding-soft-wash-after-restored.jpg",
       "caption": "White siding",
-      "note": "Green algae cleaned off a shaded wall",
+      "note": "Green algae cleaned off white vinyl siding",
       "category": "house-washing"
     },
     {
@@ -278,7 +278,7 @@
       "before": "images/driveway-wash-before.jpg",
       "after": "images/driveway-wash-after.jpg",
       "caption": "Driveway",
-      "note": "Dirt and mildew lifted from a curving concrete driveway",
+      "note": "Dirt and stains lifted from a curving concrete driveway",
       "category": "driveway-concrete"
     },
     {
@@ -286,7 +286,7 @@
       "before": "images/patio-wash-before.jpg",
       "after": "images/patio-wash-after.jpg",
       "caption": "Back patio",
-      "note": "Stains and mildew cleared from a covered patio",
+      "note": "Stains and mildew cleared from a concrete patio",
       "category": "driveway-concrete"
     },
     {
@@ -303,12 +303,6 @@
       "after": "images/driveway-pressure-washing-after.jpg",
       "caption": "Front driveway",
       "note": "Same driveway, same day",
-      "category": "driveway-concrete"
-    },
-    {
-      "image": "images/concrete-pressure-washing-in-progress.jpg",
-      "caption": "Mid-clean",
-      "note": "Cleaned concrete next to a section not yet done",
       "category": "driveway-concrete"
     },
     {
