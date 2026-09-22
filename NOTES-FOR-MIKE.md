@@ -47,9 +47,11 @@ These are still in the content file, switched off. Tell us which ones to switch 
 - **Decks and fences**: the Deck & Fence page has no photo.
 - **More roofs**: there's one roof before/after.
 - **The original white siding photos.** The only copy we have is a low-resolution one from the
-  before/after app, so it's shown with light sharpening (the same on both photos, nothing added or
-  removed). The two originals from your phone would look much better. We tried an AI upscale, but it
-  made the "before" look dirtier and the "after" cleaner than the real photos, so it wasn't used.
+  before/after app. The site shows a restored version: crisp edges (siding lines, window frames,
+  vents) come from an AI upscale, and the colour, exposure, and staining come from the real photo.
+  It was checked against the original so the "before" isn't dirtier and the "after" isn't cleaner
+  than what the camera recorded; the raw AI version failed that check, which is why it's blended.
+  The two originals from your phone would still be the best option.
 - **You, your crew, or your truck.** There isn't a single photo of a person or a vehicle yet. For a
   local business that's the biggest trust gap after reviews.
 - **Short phone videos** of a surface cleaner on a driveway or a soft-wash rinse. A "see it in
