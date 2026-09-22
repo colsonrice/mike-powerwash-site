@@ -37,9 +37,6 @@ These are still in the content file, switched off. Tell us which ones to switch 
   outdoor counter, and metal fence photos came over from the Cline project as phone screenshots with
   no camera information, so we can't tell whose jobs they are. If they're yours, send the original
   photos and they'll go back on.
-- **The white siding before/after.** It's a real SudsAway job, but the only copy is a low-resolution
-  one from the before/after app, and it looks blurry at the size the site shows it. Send the two
-  original photos from your phone and it goes straight back on.
 - The old site's hidden search data claimed **47 reviews at 5 stars**. That's gone.
 
 ---
@@ -49,6 +46,10 @@ These are still in the content file, switched off. Tell us which ones to switch 
 - **Commercial jobs**: a storefront, lot, or drive-through. The Commercial page has no photo.
 - **Decks and fences**: the Deck & Fence page has no photo.
 - **More roofs**: there's one roof before/after.
+- **The original white siding photos.** The only copy we have is a low-resolution one from the
+  before/after app, so it's shown with light sharpening (the same on both photos, nothing added or
+  removed). The two originals from your phone would look much better. We tried an AI upscale, but it
+  made the "before" look dirtier and the "after" cleaner than the real photos, so it wasn't used.
 - **You, your crew, or your truck.** There isn't a single photo of a person or a vehicle yet. For a
   local business that's the biggest trust gap after reviews.
 - **Short phone videos** of a surface cleaner on a driveway or a soft-wash rinse. A "see it in

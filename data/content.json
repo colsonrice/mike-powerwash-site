@@ -265,6 +265,14 @@
       "category": "roof-cleaning"
     },
     {
+      "image": "images/siding-soft-wash-after-sharpened.jpg",
+      "before": "images/siding-soft-wash-before-sharpened.jpg",
+      "after": "images/siding-soft-wash-after-sharpened.jpg",
+      "caption": "White siding",
+      "note": "Green algae cleaned off a shaded wall",
+      "category": "house-washing"
+    },
+    {
       "image": "images/driveway-wash-after.jpg",
       "before": "images/driveway-wash-before.jpg",
       "after": "images/driveway-wash-after.jpg",
@@ -317,15 +325,6 @@
       "caption": "Gutter cleanout",
       "note": "Leaves and debris cleared from a clogged gutter",
       "category": "general"
-    },
-    {
-      "image": "images/siding-soft-wash-after.jpg",
-      "before": "images/siding-soft-wash-before.jpg",
-      "after": "images/siding-soft-wash-after.jpg",
-      "caption": "White siding",
-      "note": "Green algae cleaned off a shaded wall",
-      "category": "house-washing",
-      "hidden": true
     },
     {
       "image": "images/soft-wash-two-story-siding-after.jpg",
