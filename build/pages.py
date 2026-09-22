@@ -12,8 +12,12 @@ Page = namedtuple("Page", "path html images indexed")
 FORM_ADDRESS = "sudsawayprowash@yahoo.com"
 # Where FormSubmit sends people when JavaScript is off; demo builds point at the demo.
 FORM_NEXT = BASE + "/thanks.html"
-SLIDER_SIZES_3 = "(max-width: 719px) 92vw, (max-width: 1079px) 46vw, 370px"
-SLIDER_SIZES_2 = "(max-width: 719px) 92vw, 560px"
+# (media query, width of the photo's box, the box's aspect ratio) -- see markup.sizes_attr.
+SLIDER_SIZES_3 = [("(max-width: 719px)", "92vw", 4 / 3), ("(max-width: 1079px)", "46vw", 4 / 3),
+                  (None, "370px", 4 / 3)]
+SLIDER_SIZES_2 = [("(max-width: 719px)", "92vw", 4 / 3), (None, "560px", 4 / 3)]
+HERO_SIZES = [("(max-width: 959px)", "100vw", 4 / 3), (None, "50vw", 0.9)]
+PHEAD_SIZES = [("(max-width: 959px)", "100vw", 4 / 3), (None, "50vw", 1.15)]
 
 
 def _ld(m):
@@ -67,8 +71,7 @@ def home(m):
     trust_html = f'<ul class="hero__trust">{trust}</ul>' if trust else ""
     fig = ""
     if h.image and h.image.slug:
-        fig = (f'<div class="hero__fig">{picture(h.image, "(max-width: 959px) 100vw, 50vw", eager=True)}'
-               f'<p class="hero__tag">{icon("check")}<span>Our own work, not stock photos</span></p></div>')
+        fig = f'<div class="hero__fig">{picture(h.image, HERO_SIZES, eager=True)}</div>'
 
     stats = ""
     if m.stats:
@@ -174,7 +177,7 @@ def home(m):
 
 def service(m, s):
     items = [g for g in m.gallery if g.category == s.id]
-    fig = (f'<div class="phead__fig">{picture(s.image, "(max-width: 959px) 100vw, 50vw", eager=True)}</div>'
+    fig = (f'<div class="phead__fig">{picture(s.image, PHEAD_SIZES, eager=True)}</div>'
            if s.image and s.image.slug else "")
     intro = s.intro or s.description
     steps = ""

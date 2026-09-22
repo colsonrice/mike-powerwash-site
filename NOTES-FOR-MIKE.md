@@ -37,6 +37,9 @@ These are still in the content file, switched off. Tell us which ones to switch 
   outdoor counter, and metal fence photos came over from the Cline project as phone screenshots with
   no camera information, so we can't tell whose jobs they are. If they're yours, send the original
   photos and they'll go back on.
+- **The white siding before/after.** It's a real SudsAway job, but the only copy is a low-resolution
+  one from the before/after app, and it looks blurry at the size the site shows it. Send the two
+  original photos from your phone and it goes straight back on.
 - The old site's hidden search data claimed **47 reviews at 5 stars**. That's gone.
 
 ---

@@ -1,9 +1,9 @@
 """Small HTML building blocks shared by every page."""
 import json
+import re
 from html import escape
 
 BASE = "https://sudsawayprowash.com"
-WIDTHS = (480, 800, 1280)
 
 
 def esc(text):
@@ -60,27 +60,52 @@ def icon_for(text):
     return "check"
 
 
+def _scaled(length, factor):
+    if factor <= 1.005:
+        return length
+    px = re.fullmatch(r"(\d+(?:\.\d+)?)px", length)
+    if px:
+        return f"{round(float(px.group(1)) * factor)}px"
+    return f"calc({length} * {factor:.2f})"
+
+
+def sizes_attr(img, sizes):
+    """Build a sizes attribute from [(media, box width, box aspect)].
+
+    Photos fill their box with object-fit: cover, so one wider than its box is
+    drawn wider than the box itself. Scaling each width by that overflow makes
+    the browser pick a rendition with enough pixels instead of stretching one.
+    """
+    ratio = img.w / img.h if img.h else 1
+    out = []
+    for media, length, box in sizes:
+        value = _scaled(length, max(1.0, ratio / box) if box else 1.0)
+        out.append(f"{media} {value}" if media else value)
+    return ", ".join(out)
+
+
 def picture(img, sizes, cls="", eager=False):
     """Responsive <picture>; empty string when the image has no renditions."""
-    if not img or not getattr(img, "slug", None):
+    if not img or not getattr(img, "slug", None) or not getattr(img, "widths", None):
         return ""
     src = f"/assets/img/{img.slug}"
-    actual = {}
-    for w in WIDTHS:
-        actual.setdefault(min(w, img.w), w)
-    webp = ", ".join(f"{src}-{name}.webp {real}w" for real, name in sorted(actual.items()))
-    jpg = ", ".join(f"{src}-{name}.jpg {real}w" for real, name in sorted(actual.items()))
+    webp = ", ".join(f"{src}-{name}.webp {actual}w" for name, actual in img.widths)
+    jpg = ", ".join(f"{src}-{name}.jpg {actual}w" for name, actual in img.widths)
+    fallback = 800 if any(name == 800 for name, _ in img.widths) else img.widths[-1][0]
+    s = sizes_attr(img, sizes)
     load = 'loading="eager" fetchpriority="high"' if eager else 'loading="lazy"'
     c = f' class="{cls}"' if cls else ""
-    return (f'<picture{c}><source type="image/webp" srcset="{webp}" sizes="{sizes}">'
-            f'<img src="{src}-800.jpg" srcset="{jpg}" sizes="{sizes}" alt="{esc(img.alt)}" '
+    return (f'<picture{c}><source type="image/webp" srcset="{webp}" sizes="{s}">'
+            f'<img src="{src}-{fallback}.jpg" srcset="{jpg}" sizes="{s}" alt="{esc(img.alt)}" '
             f'width="{img.w}" height="{img.h}" {load} decoding="async"></picture>')
 
 
-def img_url(img, width=1280):
-    if not img or not getattr(img, "slug", None):
+def img_url(img):
+    """Absolute URL of a ~1280px JPEG, for Open Graph tags and the sitemap."""
+    if not img or not getattr(img, "slug", None) or not getattr(img, "widths", None):
         return None
-    return f"{BASE}/assets/img/{img.slug}-{width}.jpg"
+    names = [name for name, _ in img.widths]
+    return f"{BASE}/assets/img/{img.slug}-{1280 if 1280 in names else names[-1]}.jpg"
 
 
 def shot(item, sizes, extra_cls=""):

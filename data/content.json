@@ -22,7 +22,7 @@
     ]
   },
   "hero": {
-    "heroImage": "images/roof-soft-wash-after.jpg",
+    "heroImage": "images/driveway-pressure-washing-after.jpg",
     "headline": "Your property\ndeserves to shine.",
     "subheadline": "Professional power washing and soft washing that restores your home's curb appeal and protects your investment.",
     "cta": "Get a free estimate",
@@ -33,7 +33,7 @@
       "Free Estimates",
       "Professional-Grade Equipment"
     ],
-    "heroAlt": "Clean garage roof and siding after a SudsAway soft wash"
+    "heroAlt": "A long concrete driveway, freshly pressure washed, curving past a green lawn"
   },
   "stats": [
     {
@@ -68,7 +68,7 @@
       "summary": "Siding, brick, and trim cleaned with a low-pressure soft wash.",
       "description": "Restore your home's curb appeal with our safe, effective soft washing system. We gently remove years of dirt, algae, mildew, and grime from siding, brick, stucco, and more — without damaging your surfaces.",
       "icon": "home",
-      "image": "images/siding-soft-wash-after.jpg",
+      "image": "images/soft-wash-siding-after.jpg",
       "intro": "Most of what makes a house look tired is organic growth: green algae on the shaded side, black mildew spots, and the dirt they hold onto. A soft wash uses cleaning solution at low pressure to kill that growth rather than blast it off, so the siding comes back clean without being forced apart or etched.",
       "steps": [
         "Walk the house with you and note anything delicate: light fixtures, outlets, open vents, and plantings.",
@@ -227,7 +227,7 @@
       "summary": "Low-pressure cleaning for roofs, siding, and painted surfaces.",
       "description": "For delicate surfaces that can't handle high pressure. Our soft wash system uses specialized cleaning solutions at low pressure to safely clean roofs, siding, and painted surfaces.",
       "icon": "droplet",
-      "image": "images/soft-wash-siding-after.jpg",
+      "image": "images/roof-soft-wash-after.jpg",
       "intro": "Soft washing cleans with solution rather than force. A low-pressure spray applies it, it breaks down algae, mildew, and dirt, and a gentle rinse carries everything away. It's the method for anything high pressure could damage, and because it kills growth instead of just moving it, surfaces stay clean longer.",
       "steps": [
         "Protect plants and cover outlets and fixtures.",
@@ -257,20 +257,20 @@
   ],
   "gallery": [
     {
+      "image": "images/roof-soft-wash-after.jpg",
+      "before": "images/roof-soft-wash-before.jpg",
+      "after": "images/roof-soft-wash-after.jpg",
+      "caption": "Garage roof",
+      "note": "Dark algae streaks soft washed off the shingles",
+      "category": "roof-cleaning"
+    },
+    {
       "image": "images/driveway-wash-after.jpg",
       "before": "images/driveway-wash-before.jpg",
       "after": "images/driveway-wash-after.jpg",
       "caption": "Driveway",
       "note": "Dirt and mildew lifted from a curving concrete driveway",
       "category": "driveway-concrete"
-    },
-    {
-      "image": "images/siding-soft-wash-after.jpg",
-      "before": "images/siding-soft-wash-before.jpg",
-      "after": "images/siding-soft-wash-after.jpg",
-      "caption": "White siding",
-      "note": "Green algae cleaned off a shaded wall",
-      "category": "house-washing"
     },
     {
       "image": "images/patio-wash-after.jpg",
@@ -281,20 +281,12 @@
       "category": "driveway-concrete"
     },
     {
-      "image": "images/roof-soft-wash-after.jpg",
-      "before": "images/roof-soft-wash-before.jpg",
-      "after": "images/roof-soft-wash-after.jpg",
-      "caption": "Garage roof",
-      "note": "Dark algae streaks soft washed off the shingles",
-      "category": "roof-cleaning"
-    },
-    {
       "image": "images/soft-wash-siding-after.jpg",
       "before": "images/soft-wash-siding-before.jpg",
       "after": "images/soft-wash-siding-after.jpg",
       "caption": "Dark siding",
       "note": "Streaks and grime washed off dark vinyl siding",
-      "category": "soft-washing"
+      "category": "house-washing"
     },
     {
       "image": "images/driveway-pressure-washing-after.jpg",
@@ -325,6 +317,15 @@
       "caption": "Gutter cleanout",
       "note": "Leaves and debris cleared from a clogged gutter",
       "category": "general"
+    },
+    {
+      "image": "images/siding-soft-wash-after.jpg",
+      "before": "images/siding-soft-wash-before.jpg",
+      "after": "images/siding-soft-wash-after.jpg",
+      "caption": "White siding",
+      "note": "Green algae cleaned off a shaded wall",
+      "category": "house-washing",
+      "hidden": true
     },
     {
       "image": "images/soft-wash-two-story-siding-after.jpg",

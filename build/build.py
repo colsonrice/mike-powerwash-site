@@ -100,7 +100,7 @@ def main(argv=None):
     for img in _images_in(m):
         if img and img.path in manifest:
             info = manifest[img.path]
-            img.slug, img.w, img.h = info["slug"], info["w"], info["h"]
+            img.slug, img.w, img.h, img.widths = info["slug"], info["w"], info["h"], info["widths"]
 
     shutil.copytree(os.path.join(args.root, "assets"), os.path.join(args.out, "assets"), dirs_exist_ok=True)
     if demo:
