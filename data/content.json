@@ -199,7 +199,7 @@
       "summary": "Exterior glass, frames, and sills left clear and streak-free.",
       "description": "Exterior window cleaning that finishes off a house wash. We clean the outside glass, wipe down frames and sills, and rinse screens when you want them done.",
       "icon": "window",
-      "image": "",
+      "image": "images/window-cleaning-after.png",
       "intro": "Once the siding is clean, the glass is the next thing you notice. Exterior windows collect the same pollen, dust, and sprinkler spotting that lands on the siding, so they're worth doing while we're already there: one visit instead of two, and the whole elevation looks finished.",
       "steps": [
         "Walk the property with you and note which windows matter most, along with any cracked panes or failed seals.",
@@ -400,6 +400,14 @@
       "note": "",
       "category": "deck-fence",
       "hidden": true
+    },
+    {
+      "image": "images/window-cleaning-after.png",
+      "before": "images/window-cleaning-before.png",
+      "after": "images/window-cleaning-after.png",
+      "caption": "Window cleaning",
+      "note": "Exterior glass, frames, and sills before and after cleaning",
+      "category": "window-cleaning"
     }
   ],
   "testimonials": [
