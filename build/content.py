@@ -11,7 +11,7 @@ import os
 import re
 from types import SimpleNamespace as NS
 
-ICONS = {"home", "roof", "road", "fence", "building", "droplet", "star"}
+ICONS = {"home", "roof", "road", "fence", "building", "droplet", "window", "star"}
 ICON_ALIASES = {"concrete": "road", "commercial": "building", "soft": "droplet"}
 DEFAULT_AREA = ["Whitestown"]
 DEFAULT_NAME = "SudsAway ProWash"

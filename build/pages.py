@@ -138,8 +138,8 @@ def home(m):
 </section>"""
 
     title = f"Power & Soft Washing in Whitestown, IN | {m.business.name}"
-    desc = ("House washing, roof cleaning, driveways, decks, and commercial power washing across "
-            f"Greater Indianapolis. Based in Whitestown, IN. Free estimates.")
+    desc = ("House washing, roof cleaning, driveways, decks, windows, and commercial power washing "
+            "across Greater Indianapolis. Based in Whitestown, IN. Free estimates.")
     body = f"""<main id="main">
 <section class="hero">
   <div class="hero__grid">

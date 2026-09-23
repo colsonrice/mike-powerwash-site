@@ -91,7 +91,7 @@ def llms(m, base):
     services = "\n".join(f"- [{s.title}]({base}/services/{s.id}.html): {s.summary}" for s in m.services)
     return f"""# {b.name}
 
-> Power washing and soft washing based in Whitestown, Indiana, serving Greater Indianapolis: house washing, roof cleaning, driveways and concrete, decks and fences, and commercial properties.
+> Power washing and soft washing based in Whitestown, Indiana, serving Greater Indianapolis: house washing, roof cleaning, driveways and concrete, decks and fences, exterior windows, and commercial properties.
 
 ## Contact
 

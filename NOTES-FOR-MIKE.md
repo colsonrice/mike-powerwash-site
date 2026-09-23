@@ -20,6 +20,7 @@ The site states these as fact. If any is wrong, it needs to change before the ne
 | The "How we do it" steps on each service page: walking the job first, pre-rinsing and covering plants, a surface cleaner on flat concrete, working around business hours, recurring commercial visits | Service pages | Is that how you actually work? Anything to add or remove? |
 | "We'll tell you what to expect before we start" about old oil stains | Driveway & Concrete FAQ | OK to promise? |
 | Service area: Whitestown, Zionsville, Indianapolis, Carmel, Westfield, Brownsburg, Lebanon, Avon, Plainfield, Fishers | Home, Contact, search data | Copied from the Cline site's washing area. Right for SudsAway? |
+| Window cleaning is **exterior only**: glass, frames, sills, and screens rinsed on request | Window Cleaning | Added on 2026-09-23. Is exterior-only right, and do you want screens included or quoted separately? Interior glass is written as something you don't offer. |
 
 ---
 
@@ -46,6 +47,8 @@ These are still in the content file, switched off. Tell us which ones to switch 
 - **Commercial jobs**: a storefront, lot, or drive-through. The Commercial page has no photo.
 - **Decks and fences**: the Deck & Fence page has no photo.
 - **More roofs**: there's one roof before/after.
+- **Windows**: the new Window Cleaning page has no photo. A before/after of a spotted window, or a
+  shot of the glass mid-clean, would carry that page.
 - **The original white siding photos.** The only copy we have is a low-resolution one from the
   before/after app. The site shows a restored version: crisp edges (siding lines, window frames,
   vents) come from an AI upscale, and the colour, exposure, and staining come from the real photo.

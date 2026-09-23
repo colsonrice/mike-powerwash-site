@@ -194,6 +194,43 @@
       ]
     },
     {
+      "id": "window-cleaning",
+      "title": "Window Cleaning",
+      "summary": "Exterior glass, frames, and sills left clear and streak-free.",
+      "description": "Exterior window cleaning that finishes off a house wash. We clean the outside glass, wipe down frames and sills, and rinse screens when you want them done.",
+      "icon": "window",
+      "image": "",
+      "intro": "Once the siding is clean, the glass is the next thing you notice. Exterior windows collect the same pollen, dust, and sprinkler spotting that lands on the siding, so they're worth doing while we're already there: one visit instead of two, and the whole elevation looks finished.",
+      "steps": [
+        "Walk the property with you and note which windows matter most, along with any cracked panes or failed seals.",
+        "Protect the plants and anything sitting below the windows.",
+        "Clean the exterior glass, then wipe the frames and sills.",
+        "Rinse and refit screens if you'd like them done.",
+        "Check the glass from a couple of angles before packing up."
+      ],
+      "surfaces": [
+        "Exterior window glass",
+        "Frames and sills",
+        "Window screens",
+        "Storm windows",
+        "Sliding glass doors"
+      ],
+      "faq": [
+        {
+          "question": "Do you clean the inside of the windows?",
+          "answer": "No. We clean the outside: glass, frames, and sills. Interior glass isn't something we offer, so you'd need someone else for that part."
+        },
+        {
+          "question": "Can the windows be done during a house wash?",
+          "answer": "Yes, and that's the sensible order. A house wash rinses the siding above the glass, so cleaning the windows afterwards on the same visit gives the best result."
+        },
+        {
+          "question": "Will hard water spots come off?",
+          "answer": "Sprinkler and mineral spotting is different from ordinary dirt, and long-standing deposits can etch the glass permanently. Point them out when we look at the job and you'll get an honest answer about what will come off."
+        }
+      ]
+    },
+    {
       "id": "commercial",
       "title": "Commercial Washing",
       "summary": "Storefronts, walks, and lots kept clean on a schedule.",
